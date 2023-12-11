@@ -1,0 +1,221 @@
+---
+title: "Example code for simulation"
+author: "Na Bo and Yue Wei"
+output:
+  bookdown::html_document2:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    fig_caption: yes
+    fig_width: 6
+    fig_height: 4
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an example of running simulations in the manuscript. Here we generate one simulation data from Weibull regression under balanced design and scenario 1. Other simulation design and scenarios can be run in the same way.
+
+# Simulation data generated from Weibull regression under balanced design and scenario 1
+
+Please assign your working directory to your_directory below where the folder "Simulations" is saved using the following code by replacing "Your directory of 'Simulations' folder" with your own directory:  \
+your_directory <- setwd("Your directory of 'Simulations' folder")
+```{r echo=FALSE}
+#your_directory <- setwd("/Users/nabo/Library/CloudStorage/OneDrive-UniversityofPittsburgh/NaBo/Deepsubgroup_Luna_Box/Survival/JDataScience/Code_and_Data_journal/Simulations")
+```
+
+Please install the following packages if you haven't:
+
+```{r message = F, warning = F}
+#install.packages("survival")
+#install.packages("BART")
+#install.packages("randomForestSRC", repos = "https://cran.us.r-project.org")
+#install.packages("tidyverse")
+#install.packages("gbm")
+# Alternatively, you can install the development version from GitHub:
+#if (!requireNamespace("remotes")) {
+#  install.packages("remotes")
+#}
+#remotes::install_github("gbm-developers/gbm")
+
+#install.packages("randomForest")
+#install.packages("pec")
+#install.packages()
+#library(devtools)
+#install_github("nchenderson/AFTrees")
+```
+
+We have generated one training data (train1.RData) and one test data (test.RData). Here we load the datasets from the "Simulation folder". Or you can generate one training data and test data using code below in the comment lines:
+
+```{r message = F, warning = F}
+# Load the training data that we have generated
+load(paste0(your_directory,"/prepared_simulation_data_example/train1.RData"))
+
+# generate one training data
+#source("simulation_design_survival_Weibull.R")
+#train <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "random",time.interest=15)
+
+# Load test data that we have generated
+load(paste0(your_directory,"/prepared_simulation_data_example/test.RData"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "random",time.interest=15)
+
+```
+
+If you load our prepared training and test data, please go to section 2 to run R-T, R-X, D-T and D-X.
+
+If you generate training and test data using the code data_gen_censor() above. Please prepare training and test data using the following code in the comment lines for running D-T and D-X in Python. 
+
+```{r message = F, warning = F}
+# training data
+#train1 <- train$data
+#save(train1,file = paste0(your_directory,"/prepared_simulation_data_example/train1.RData")) 
+
+# test data
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/prepared_simulation_data_example/test.RData")) 
+```
+
+
+# Example code of running one simulation
+
+R-T, R-X, B-T, B-X and Weibull true model are run in RStudio. Here we train R-T, R-X, B-T, B-X and Weibull true model in one training data and predict CATE on test data for an example.
+
+```{r message = F, warning = F}
+source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+source(paste0(your_directory,"/source_files/weibull_true.R"))
+library(survival)
+library(BART)
+library(randomForestSRC)
+library(tidyverse)
+library(gbm)
+library(randomForest)
+library(pec)
+library(AFTrees)
+
+# time.interest
+tt=15
+testdat1 <- testdat[,which(names(testdat)%in%c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event"))]
+
+# R-T
+rsf_T<-rsf_HTE_T(data=train1,testdat=testdat1,time.interest=tt)
+# R-X 
+rsf_X<-rsf_HTE_X(data=train1,testdat=testdat1,ntrees=1000,time.interest=tt)
+# B-T
+baft_T<-baft_HTE_T(data=train1,testdat=testdat1,time.interest=tt)
+# B-X
+baft_X<-baft_HTE_X(data=train1,testdat=testdat1,ntrees=1000,time.interest=tt)
+# Weibull true model
+weib.true<-weibull_true(data=train1,testdat=testdat1,time.interest=tt,setting=1) 
+
+# combine results
+diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,weib_diff=weib.true$diff,true_diff=testdat$true.diff)
+```
+
+D-T and D-T are run using Python. We have run D-T and D-X using our prepared training and test data. Results "Tlearner_result.csv" and "Xlearner_result.csv" are saved in /Simulations/prepared_simulation_data_example" folder.
+
+If you generate training and test data by yourself using the code data_gen_censor() in section 1, please run D-T and D-X in Python as the following: \
+
+1. Install the following Python modules if you haven't: pyreadr, tensorflow, pandas, matplotlib, sklearn, numpy, multiprocessing. 
+These modules can be installed using command line as the following if you use Anaconda: conda activate venv. This step is to open the virtual environment of the Python version that you install. venv is the name of your virtual environment. If you run Python on server, you can open your virtual environment by typing the command line: source ~/bin/activate/venv . After entering your virtual environment, use the following command line to install Python modules: pip install module_name. If you install Python3, please type: pip3 install module_name. Every time you would like to run the .py files, please enter your virtual environment where these modules are installed. \
+
+2. Enter your virtual environment where these modules are installed. \
+
+2. Please put DNNSurv_Tlearner_1run.py, DNNSurv_Xlearner_1run.py, fun_util.py, test.RData and train1.RData that you generate using data_gen_censor() into the same folder. \
+
+3. Set up the folder directory in line 2 of DNNSurv_Tlearner_1run.py and DNNSurv_Xlearner_1run.py. \
+
+4. Submit DNNSurv_Tlearner_1run.py and DNNSurv_Xlearner_1run.py to Python using command line: python DNNSurv_Xlearner_1run.py. You can add a & at the end if you are using server for nohup option. \
+For 100 runs, please visit "reproduce_simulation_tables_plots.Rmd" for submitting "DNNSurv_Tlearner_100runs.py" and "DNNSurv_Xlearner_100runs.py". \
+In the output result file, the first 10000 rows are predicted CATE; the second 10000 rows are true CATE.
+
+
+# Example code of performance evaluation
+
+Here we get result "diff" after running R-T, R-X, B-T, and B-X in section 2 using our prepared training and test data. And we have run D-T and D-X in Python using our prepared training and test data. Results are saved as "T-learner_result.csv" and "X-learner.csv" under "Simulations" folder.
+
+Load in D-T and D-X results:
+
+```{r message = F, warning = F}
+Tlearner_result <- read.table(paste0(your_directory,"/prepared_simulation_data_example/Tlearner_result.csv"), quote="\"", comment.char="")
+Xlearner_result <- read.table(paste0(your_directory,"/prepared_simulation_data_example/Xlearner_result.csv"), quote="\"", comment.char="")
+D_T <- Tlearner_result[1:10000,]
+D_X <- Xlearner_result[1:10000,]
+
+random1.diff <- cbind(diff,D_T,D_X)
+colnames(random1.diff) <- c("rsf_T_diff","rsf_X_diff" ,"baft_T_diff","baft_X_diff","weib_diff","true_diff","deepsurv_T_diff","deepsurv_X_diff")
+```
+
+Binned bias and RMSE:
+
+```{r message = F, warning = F}
+RMSE_rsf_T<-RMSE_rsf_X<-RMSE_baft_T<-RMSE_baft_X<-RMSE_weib<-RMSE_dnnsurv_T<-RMSE_dnnsurv_X<-0
+bias_rsf_T<-bias_rsf_X<-bias_baft_T<-bias_baft_X<-bias_weib<-bias_dnnsurv_T<-bias_dnnsurv_X<-0
+
+dat<-random1.diff
+dat<-dat[order(dat$true_diff),]
+quant<-quantile(dat$true_diff,probs=seq(0,1,length.out=50))
+    
+for (j in 1:49){
+  datq<-dat[which(dat$true_diff>quant[j]&dat$true_diff<=quant[j+1]),]
+  bias_rsf_T<-bias_rsf_T+mean(datq$rsf_T_diff-datq$true_diff)
+  bias_rsf_X<-bias_rsf_X+mean(datq$rsf_X_diff-datq$true_diff)
+  bias_baft_T<-bias_baft_T+mean(datq$baft_T_diff-datq$true_diff)
+  bias_baft_X<-bias_baft_X+mean(datq$baft_X_diff-datq$true_diff)
+  bias_weib<-bias_weib+mean(datq$weib_diff-datq$true_diff)
+  bias_dnnsurv_T<-bias_dnnsurv_T+mean(datq$deepsurv_T_diff-datq$true_diff)
+  bias_dnnsurv_X<-bias_dnnsurv_X+mean(datq$deepsurv_X_diff-datq$true_diff)
+  RMSE_rsf_T<-RMSE_rsf_T+sqrt(mean((datq$rsf_T_diff-datq$true_diff)^2))
+  RMSE_rsf_X<-RMSE_rsf_X+sqrt(mean((datq$rsf_X_diff-datq$true_diff)^2))
+  RMSE_baft_T<-RMSE_baft_T+sqrt(mean((datq$baft_T_diff-datq$true_diff)^2))
+  RMSE_baft_X<-RMSE_baft_X+sqrt(mean((datq$baft_X_diff-datq$true_diff)^2))
+  RMSE_weib<-RMSE_weib+sqrt(mean((datq$weib_diff-datq$true_diff)^2))
+  RMSE_dnnsurv_T<-RMSE_dnnsurv_T+sqrt(mean((datq$deepsurv_T_diff-datq$true_diff)^2))
+  RMSE_dnnsurv_X<-RMSE_dnnsurv_X+sqrt(mean((datq$deepsurv_X_diff-datq$true_diff)^2))
+}
+bias_rsf_T=bias_rsf_T/50
+bias_rsf_X=bias_rsf_X/50
+bias_baft_T=bias_baft_T/50
+bias_baft_X=bias_baft_X/50
+bias_weib=bias_weib/50
+bias_dnnsurv_T=bias_dnnsurv_T/50
+bias_dnnsurv_X=bias_dnnsurv_X/50
+RMSE_rsf_T=RMSE_rsf_T/50
+RMSE_rsf_X=RMSE_rsf_X/50
+RMSE_baft_T=RMSE_baft_T/50
+RMSE_baft_X=RMSE_baft_X/50
+RMSE_weib=RMSE_weib/50
+RMSE_dnnsurv_T=RMSE_dnnsurv_T/50
+RMSE_dnnsurv_X=RMSE_dnnsurv_X/50
+```
+
+Binned bias of R-T, R-X, B-T, B-X, D-T, D-X and Weibull true model:
+
+```{r message = F, warning = F}
+bias_rsf_T
+bias_rsf_X
+bias_baft_T
+bias_baft_X
+bias_dnnsurv_T
+bias_dnnsurv_X
+bias_weib
+```
+
+Binned RMSE of R-T, R-X, B-T, B-X, D-T, D-X and Weibull true model:
+
+```{r message = F, warning = F}
+RMSE_rsf_T
+RMSE_rsf_X
+RMSE_baft_T
+RMSE_baft_X
+RMSE_dnnsurv_T
+RMSE_dnnsurv_X
+RMSE_weib
+```

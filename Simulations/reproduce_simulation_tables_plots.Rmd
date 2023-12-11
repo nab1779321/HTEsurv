@@ -1,0 +1,1751 @@
+---
+title: "Reproduce simulation tables and plots in the main text"
+author: "Na Bo and Yue Wei"
+output:
+  bookdown::html_document2:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    fig_caption: yes
+    fig_width: 6
+    fig_height: 4
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This is the code for reproducing tables and plots in the main text. We have saved intermediate results (predicted CATE) under "Simulations/intermediate_result_100simulations".
+
+Please set up your working directory where the folder "Simulations" is saved using the following code by replacing "Your directory of 'Simulations' folder" with your own directory:  \
+your_directory <- setwd("Your directory of 'Simulations' folder")
+```{r echo=FALSE}
+#your_directory <- setwd("Your directory of 'Simulations' folder")
+```
+
+Please install the following packages if you haven't:
+
+```{r}
+#install.packages("tableone")
+#install.packages("tidyr")
+```
+
+# Run simulations
+
+Please copy these codes to an R file and use server to run codes under this section. We have commented the codes out as it requires server.
+
+## Weibull model case
+
+This section provide codes to run R-T, R-X, B-T, B-X and CSF for 100 simulations when data is generated from Weibull models at median failure time under scenario1 to scenario 3. If time of interest is 3rd quantile of failure times (tt=22 in scenario1 and scenario 2; tt=20 in scenario3), please change "tt" in the code below (see comments in the code below). We will also prepare training and test data for running D-T and D-X in Python.
+
+Balanced design:
+
+```{r class.source = 'fold-show'}
+###-------------------------------------------- scenario 1 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "random",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=1)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario1.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_balanced_mediantt_n1000p10_test10000_scenario1.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_balanced_setting1_dataframe.RData")) 
+
+
+###-------------------------------------------- scenario 2 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "random",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=2)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario2.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_balanced_mediantt_n1000p10_test10000_scenario2.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_balanced_setting2_dataframe.RData")) 
+
+###-------------------------------------------- scenario 3 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+ 
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-14  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "random",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=3)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario3.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_balanced_mediantt_n1000p10_test10000_scenario3.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_balanced_setting3_dataframe.RData")) 
+```
+
+Dependent design:
+
+```{r class.source = 'fold-show'}
+###-------------------------------------------- scenario 1 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "dependent",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "dependent",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=1)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+#    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_dependent_mediantt_RTRXBTBX_n1000p10_test10000_scenario1.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_dependent_mediantt_n1000p10_test10000_scenario1.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario1_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_dependent_setting1_dataframe.RData")) 
+
+###-------------------------------------------- scenario 2 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "dependent",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "dependent",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = #(10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=2)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_dependent_mediantt_RTRXBTBX_n1000p10_test10000_scenario2.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_dependent_mediantt_n1000p10_test10000_scenario2.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario2_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_dependent_setting2_dataframe.RData")) 
+
+###-------------------------------------------- scenario 3 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "dependent",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+ 
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-14  # assign a time point of interest
+#      simdata <- data_gen_censor(n=1000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "dependent",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#     baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=3)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_dependent_mediantt_RTRXBTBX_n1000p10_test10000_scenario3.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_dependent_mediantt_n1000p10_test10000_scenario3.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_dependent_scenario3_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_dependent_setting3_dataframe.RData")) 
+```
+
+Unbalanced design with 4000 samples in training data:
+
+```{r class.source = 'fold-show'}
+###-------------------------------------------- scenario 1 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "unbalanced",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_unbalanced_scenario1_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=4000, p=10,  PH=TRUE, censor = "30%", setting = 1, ex = "unbalanced",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=1)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_unbalanced4000n_scenario1_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario1_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario1_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+#    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario1_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_unbalanced4000n_mediantt_RTRXBTBX_n1000p10_test10000_scenario1.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_unbalanced4000n_mediantt_n1000p10_test10000_scenario1.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_unbalanced4000n_scenario1_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_unbalanced4000n_setting1_dataframe.RData")) 
+
+###-------------------------------------------- scenario 2 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "unbalanced",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-15  # assign a time point of interest
+#      simdata <- data_gen_censor(n=4000, p=10,  PH=TRUE, censor = "30%", setting = 2, ex = "unbalanced",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#     cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=2)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_unbalanced4000n_mediantt_RTRXBTBX_n1000p10_test10000_scenario2.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_unbalanced4000n_mediantt_n1000p10_test10000_scenario2.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_unbalanced4000n_scenario2_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_unbalanced4000n_setting2_dataframe.RData")) 
+
+###-------------------------------------------- scenario 3 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_Weibull.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/weibull_true.R"))
+
+# generate test data
+#mydata <- data_gen_censor(n=10000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "unbalanced",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+ 
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-14  # assign a time point of interest
+#      simdata <- data_gen_censor(n=4000, p=10,  PH=TRUE, censor = "30%", setting = 3, ex = "unbalanced",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      cs.forest.prob <- causal_survival_forest(dat[,c(1:10)], dat$Time, dat$Treatment, dat$Event,target = "survival.probability",horizon = tt,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads = 1)
+#      p.prob = predict(cs.forest.prob, mydata$data[,c(1:10)])
+#      csa_diff<-data.frame(diff=p.prob)
+#      weib.true<-weibull_true(data=dat,testdat=mydata$data,time.interest=tt,setting=3)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,csf_diff=csa_diff,weib_diff=weib.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#dat_all <- NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+    
+#    load(paste0(your_directory,"/simdata_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+#    dat$sim=i+(s-1)*5
+#    dat_all<-rbind(dat_all,dat)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_weib_unbalanced4000n_mediantt_RTRXBTBX_n1000p10_test10000_scenario3.RData")) # simulation result file from 100 simulations
+#save(dat_all,file=paste0(your_directory,"/dat_all_weib_unbalanced4000n_mediantt_n1000p10_test10000_scenario3.RData")) # save training data from 100 simulations
+
+# prepare test data for Python
+#load(paste0(your_directory,"/test10000_weib_mediantt_unbalanced4000n_scenario3_",(s-1)*5+i,".RData"))
+#testdat <- cbind(mydata$data, mydata$true.diff,mydata$true1, mydata$true0)
+#colnames(testdat) <- c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","Treatment","Time","Event","true.diff","true1","true0")
+#save(testdat,file = paste0(your_directory,"/source_files/testDat10000_weib_mediantt_unbalanced4000n_setting3_dataframe.RData")) 
+```
+
+D-T and D-T are run using Python. Please run D-T and D-X in Python as the following: \
+
+1. Install the following Python modules if you haven't: pyreadr, tensorflow, pandas, matplotlib, sklearn, numpy, multiprocessing. 
+These modules can be installed using command line as the following if you use Anaconda: conda activate venv. This step is to open the virtual environment of the Python version that you install. venv is the name of your virtual environment. If you run Python on server, you can open your virtual environment by typing the command line: source ~/bin/activate/venv . After entering your virtual environment, use the following command line to install Python modules: pip install module_name. If you install Python3, please type: pip3 install module_name. Every time you would like to run the .py files, please enter your virtual environment where these modules are installed. \
+
+2. Enter your virtual environment where these modules are installed. \
+
+3. Please put DNNSurv_Tlearner_100runs.py, DNNSurv_Xlearner_100runs.py, fun_util.py, training and test data prepared above into the same folder (Please create a new folder if you would like to.). \
+
+The names of test data are listed here:\
+Balanced design and scenario 1: testDat10000_weib_mediantt_balanced_setting1_dataframe.RData; Balanced design and scenario 2: testDat10000_weib_mediantt_balanced_setting2_dataframe.RData; Balanced design and scenario 3: testDat10000_weib_mediantt_balanced_setting3_dataframe.RData. Dependent design and scenario1: testDat10000_weib_mediantt_dependent_setting1_dataframe.RData; Dependent design and scenario2: testDat10000_weib_mediantt_dependent_setting2_dataframe.RData; Dependent design and scenario3: testDat10000_weib_mediantt_dependent_setting3_dataframe.RData. Unbalanced design (4000 samples) and scenario 1: testDat10000_weib_mediantt_unbalanced4000n_setting1_dataframe.RData; Unbalanced design (4000 samples) and scenario 2: testDat10000_weib_mediantt_unbalanced4000n_setting2_dataframe.RData; Unbalanced design (4000 samples) and scenario 3: testDat10000_weib_mediantt_unbalanced4000n_setting3_dataframe.RData.\
+
+The names of test data are listed here:\
+Balanced design and scenario 1: testDat10000_weib_mediantt_balanced_setting1_dataframe.RData; Balanced design and scenario 2: testDat10000_weib_mediantt_balanced_setting2_dataframe.RData; Balanced design and scenario 3: testDat10000_weib_mediantt_balanced_setting3_dataframe.RData. Dependent design and scenario1: testDat10000_weib_mediantt_dependent_setting1_dataframe.RData; Dependent design and scenario2: testDat10000_weib_mediantt_dependent_setting2_dataframe.RData; Dependent design and scenario3: testDat10000_weib_mediantt_dependent_setting3_dataframe.RData. Unbalanced design (4000 samples) and scenario 1: testDat10000_weib_mediantt_unbalanced4000n_setting1_dataframe.RData; Unbalanced design (4000 samples) and scenario 2: testDat10000_weib_mediantt_unbalanced4000n_setting2_dataframe.RData; Unbalanced design (4000 samples) and scenario 3: testDat10000_weib_mediantt_unbalanced4000n_setting3_dataframe.RData.\
+
+4. Set up the folder directory in line 2 of DNNSurv_Tlearner_1run.py and DNNSurv_Xlearner_1run.py. \
+
+5. In line 24, change training data name for different simulation design and scenarios. 
+
+6. In line 25, change test data name for different simulation design and scenarios. 
+
+7. In line 27, please give a name to the output result file. 
+
+8. Submit DNNSurv_Tlearner_100runs.py and DNNSurv_Xlearner_100runs.py to Python using command line: python DNNSurv_Xlearner_100runs.py. You can add a & at the end if you are using server for nohup option. \
+For 100 runs, please visit "Example_code_simulation_1run.Rmd" for submitting a single run of simulation files "DNNSurv_Tlearner_1run.py" and "DNNSurv_Xlearner_1run.py". \
+In the output result file, the first 10000 rows are predicted CATE; the second 10000 rows are true CATE.
+
+9. For each simulation design and scenario, combine D-T and D-X with other methods that are run in R as the following code. Here we give an example of combining all simulation results under balanced design:
+
+```{r class.source = 'fold-show'}
+###----------------------------------- scenario 1 -------------------------------------###
+# load R-T, R-X, B-T, B-X, CSF results
+#load(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario1.RData"))
+
+# load D-T results
+#your_D_T_result_file_name <- "Tlearner_result_weib_balanced_mediantt_scenario1.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-T output result file")
+#Tlearner <- read_csv(paste0(your_directory ,your_D_T_result_file_name), col_names = FALSE)
+#Tlearner1<-t(Tlearner)
+#colnames(Tlearner1) <- c("deepsurv_T_diff","true_diff")
+#diff_all1 <- cbind(diff_all,Tlearner1[,1])
+#colnames(diff_all1)[length(colnames(diff_all1))] <- "deepsurv_T_diff"
+
+# load D-X results
+#your_D_X_result_file_name <- "Xlearner_result_weib_balanced_mediantt_scenario1.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-X output result file")
+#Xlearner <- read_csv(paste0(your_directory ,your_D_X_result_file_name), col_names = FALSE)
+#Xlearner1<-t(Xlearner)
+#colnames(Xlearner1) <- c("deepsurv_X_diff","true_diff")
+#random1.diff.all <- cbind(diff_all1,Xlearner1[,1])
+#colnames(random1.diff.all)[length(colnames(random1.diff.all))] <- "deepsurv_X_diff"
+
+###----------------------------------- scenario 2 -------------------------------------###
+# load R-T, R-X, B-T, B-X, CSF results
+#load(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario2.RData"))
+
+# load D-T results
+#your_D_T_result_file_name <- "Tlearner_result_weib_balanced_mediantt_scenario2.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-T output result file")
+#Tlearner <- read_csv(paste0(your_directory ,your_D_T_result_file_name), col_names = FALSE)
+#Tlearner1<-t(Tlearner)
+#colnames(Tlearner1) <- c("deepsurv_T_diff","true_diff")
+#diff_all1 <- cbind(diff_all,Tlearner1[,1])
+#colnames(diff_all1)[length(colnames(diff_all1))] <- "deepsurv_T_diff"
+
+# load D-X results
+#your_D_X_result_file_name <- "Xlearner_result_weib_balanced_mediantt_scenario2.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-X output result file")
+#Xlearner <- read_csv(paste0(your_directory ,your_D_X_result_file_name), col_names = FALSE)
+#Xlearner1<-t(Xlearner)
+#colnames(Xlearner1) <- c("deepsurv_X_diff","true_diff")
+#random2.diff.all <- cbind(diff_all1,Xlearner1[,1])
+#colnames(random2.diff.all)[length(colnames(random2.diff.all))] <- "deepsurv_X_diff"
+
+###----------------------------------- scenario 3 -------------------------------------###
+# load R-T, R-X, B-T, B-X, CSF results
+#load(diff_all,file=paste0(your_directory,"/result_weib_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario3.RData"))
+
+# load D-T results
+#your_D_T_result_file_name <- "Tlearner_result_weib_balanced_mediantt_scenario3.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-T output result file")
+#Tlearner <- read_csv(paste0(your_directory ,your_D_T_result_file_name), col_names = FALSE)
+#Tlearner1<-t(Tlearner)
+#colnames(Tlearner1) <- c("deepsurv_T_diff","true_diff")
+#diff_all1 <- cbind(diff_all,Tlearner1[,1])
+#colnames(diff_all1)[length(colnames(diff_all1))] <- "deepsurv_T_diff"
+
+# load D-X results
+#your_D_X_result_file_name <- "Xlearner_result_weib_balanced_mediantt_scenario3.csv" # please change the name of output file to what you assign in .py file line 27. 
+#library(readr)
+#your_directory <- setwd("The directory contain your D-X output result file")
+#Xlearner <- read_csv(paste0(your_directory ,your_D_X_result_file_name), col_names = FALSE)
+#Xlearner1<-t(Xlearner)
+#colnames(Xlearner1) <- c("deepsurv_X_diff","true_diff")
+#random3.diff.all <- cbind(diff_all1,Xlearner1[,1])
+#colnames(random3.diff.all)[length(colnames(random3.diff.all))] <- "deepsurv_X_diff"
+
+#save(random1.diff.all,random2.diff.all,random3.diff.all,file = paste0(your_directory,"/intermediate_result_100simulations/weib_balanced_mediantt.RData"))
+```
+
+
+##  Standard logistic model case
+
+Balanced design:
+
+```{r class.source = 'fold-show'}
+###-------------------------------------------- scenario 1 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_StandardLogistic.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/StandardLogistic_TrueModel.R"))
+
+# generate test data
+#tt<-1.05  # assign a time point of interest
+#mydata <- data_gen_censor_slogistic(n=10000, p=10,sigma0=1,sigma1=2,r=0.15,mu=0, censor = "30%", setting = 1, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_logis_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-1.05  # assign a time point of interest
+#      simdata <- data_gen_censor_slogistic(n=1000, p=10,sigma0=1,sigma1=2,r=0.15,mu=0, censor = "30%", setting = 1, ex = "random",time.interest=1.05)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      logis.true<-slogistic_true(data=dat,testdat=mydata$data,time.interest=tt,setting=1)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,logis_diff=logis.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_logis_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario1_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_logis_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario1.RData"))
+
+###-------------------------------------------- scenario 2 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_StandardLogistic.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/StandardLogistic_TrueModel.R"))
+
+# generate test data
+#tt<-1.1  # assign a time point of interest
+#mydata <- data_gen_censor_slogistic(n=10000, p=10,sigma0=0.5,sigma1=1,r=0.22,mu=0, censor = "30%", setting = 2, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_logis_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-1.1  # assign a time point of interest
+#      simdata <- data_gen_censor_slogistic(n=1000, p=10,sigma0=0.5,sigma1=1,r=0.22,mu=0, censor = "30%", setting = 2, ex = "random",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      logis.true<-slogistic_true(data=dat,testdat=mydata$data,time.interest=tt,setting=2)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,logis_diff=logis.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_logis_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario2_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_logis_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario2.RData"))
+
+###-------------------------------------------- scenario 3 ----------------------------------------------###
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(doMC)
+#source(paste0(your_directory,"/source_files/simulation_design_survival_StandardLogistic.R"))
+#source(paste0(your_directory,"/source_files/rsf_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/baft_TXlearners.R"))
+#source(paste0(your_directory,"/source_files/StandardLogistic_TrueModel.R"))
+
+# generate test data
+#tt<-1.29 # assign a time point of interest
+#mydata <- data_gen_censor_slogistic(n=10000, p=10,sigma0=0.5,sigma1=1,r=0.2,mu=0, censor = "30%", setting = 3, ex = "random",time.interest=tt)
+#save(mydata,file=paste0(your_directory,"/test10000_logis_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+
+# run simulation
+#nCores=20 # register 20 cores
+#registerDoMC(nCores)
+#foreach (s=1:20) %dopar% {
+#  B<-5
+#  for (i in 1:B){
+#    tryCatch({
+#      set.seed(100871+i+s*15213)
+#      tt<-1.29  # assign a time point of interest
+#      simdata <- data_gen_censor_slogistic(n=1000, p=10,sigma0=0.5,sigma1=1,r=0.2,mu=0, censor = "30%", setting = 3, ex = "random",time.interest=tt)
+#      dat <- simdata$data
+#      rsf_T<-rsf_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      rsf_X<-rsf_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      baft_T<-baft_HTE_T(data=dat,testdat=mydata$data,time.interest=tt)
+#      baft_X<-baft_HTE_X(data=dat,testdat=mydata$data,ntrees=1000,time.interest=tt)
+#      logis.true<-slogistic_true(data=dat,testdat=mydata$data,time.interest=tt,setting=3)
+      
+      # save prediction results
+#      diff<-data.frame(rsf_T_diff=rsf_T$diff,rsf_X_diff=rsf_X$diff,baft_T_diff=baft_T$diff,baft_X_diff=baft_X$diff,logis_diff=logis.true$diff,true_diff=mydata$true.diff)
+#      save(diff,ratio,file=paste0(your_directory,"/result_logis_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+      
+      # save simulation data in order to run D-T and D-X in Python
+#      save(dat,file=paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#    }
+#    ,error=function(e){
+#      print(paste("Error at i=",(s-1)*5+i))
+#    })
+#  }
+#}
+#rm(list=ls())
+
+#diff_all<-NULL
+#for (s in 1:20){
+#  for (i in 1:5){
+#    tryCatch({
+#    load(paste0(your_directory,"/simdata_logis_mediantt_balanced_scenario3_",(s-1)*5+i,".RData"))
+#    diff$sim=i+(s-1)*5
+#    diff_all<-rbind(diff_all,diff)
+#    },error=function(e){
+#      print(paste("Error at s,i",s,i))
+#    })
+#  }
+#}
+#save(diff_all,file=paste0(your_directory,"/result_logis_balanced_mediantt_RTRXBTBX_n1000p10_test10000_scenario3.RData"))
+```
+
+
+# Tables and plots in main text
+
+This section provides codes to reproduce tables and plots in main text of simulations by loading the intermediate results.
+
+## Figure 1
+
+This figure shows binned bias and RMSE when data is generated from Weibull models under balanced design and scenario 1. Because the size of the intermediate results are too large, we have saved summarized biases and RMSEs from 100 simulations in "Simulations/intermediate_result_100simulations" folder.
+
+The following codes are examples for loading the predicted CATE on test datasets in 100 runs of the simulations. The codes are commented out because the result files are too large to be loaded for the manuscript submission. Please jump to the next chunk for loading summarized biases and RMSEs. 
+
+Load predicted CATE from R-T, R-X, B-T, B-X, D-T, D-X and CSF when data is generated from Weibull models under balanced design and scenario1:
+
+```{r}
+#load(paste0(your_directory,"/intermediate_result_100simulations/weib_balanced_mediantt.RData"))
+
+#random1.diff.all$ID<-random2.diff.all$ID<-random3.diff.all$ID<-rep(1:10000,100)
+#random<-list(random1.diff.all,random2.diff.all,random3.diff.all)
+```
+
+Calculate binned bias and RMSE:
+
+```{r message = F, warning = F}
+#RMSE_rsf_T<-RMSE_rsf_X<-RMSE_baft_T<-RMSE_baft_X<-RMSE_weib<-RMSE_dnnsurv_T<-RMSE_dnnsurv_X<-RMSE_CSF<-list(rep(NA,100),rep(NA,100),rep(NA,100))
+#bias_rsf_T<-bias_rsf_X<-bias_baft_T<-bias_baft_X<-bias_weib<-bias_dnnsurv_T<-bias_dnnsurv_X<-bias_CSF<-list(rep(NA,100),rep(NA,100),rep(NA,100))
+
+#for (s in 1:3){ # random, setting 1 to 3
+#  for (i in 1:100){ # 100 runs of results
+#    dat<-random[[s]][which(random[[s]]$sim==i),]
+#    dat<-dat[order(dat$true_diff),]
+    
+#    quant<-quantile(dat$true_diff,probs=seq(0,1,length.out=51)) 
+    
+#    bias_rsf_T[[s]][i]<-0
+#    bias_rsf_X[[s]][i]<-0
+#    bias_baft_T[[s]][i]<-0
+#    bias_baft_X[[s]][i]<-0
+#    bias_weib[[s]][i]<-0
+#    bias_dnnsurv_T[[s]][i]<-0
+#    bias_dnnsurv_X[[s]][i]<-0
+#    bias_CSF[[s]][i]<-0
+#    RMSE_rsf_T[[s]][i]<-0
+#    RMSE_rsf_X[[s]][i]<-0
+#    RMSE_baft_T[[s]][i]<-0
+#    RMSE_baft_X[[s]][i]<-0
+#    RMSE_weib[[s]][i]<-0
+#    RMSE_dnnsurv_T[[s]][i]<-0
+#    RMSE_dnnsurv_X[[s]][i]<-0
+#    RMSE_CSF[[s]][i]<-0
+    
+#    for (j in 1:50){
+#      datq<-dat[which(dat$true_diff>=quant[j]&dat$true_diff<=quant[j+1]),]
+#      bias_rsf_T[[s]][i]<-bias_rsf_T[[s]][i]+mean(datq$rsf_T_diff-datq$true_diff)
+#      bias_rsf_X[[s]][i]<-bias_rsf_X[[s]][i]+mean(datq$rsf_X_diff-datq$true_diff)
+#      bias_baft_T[[s]][i]<-bias_baft_T[[s]][i]+mean(datq$baft_T_diff-datq$true_diff)
+#      bias_baft_X[[s]][i]<-bias_baft_X[[s]][i]+mean(datq$baft_X_diff-datq$true_diff)
+#      bias_weib[[s]][i]<-bias_weib[[s]][i]+mean(datq$weib_diff-datq$true_diff)
+#      bias_dnnsurv_T[[s]][i]<-bias_dnnsurv_T[[s]][i]+mean(datq$deepsurv_T_diff-datq$true_diff)
+#      bias_dnnsurv_X[[s]][i]<-bias_dnnsurv_X[[s]][i]+mean(datq$deepsurv_X_diff-datq$true_diff)
+#      bias_CSF[[s]][i]<-bias_CSF[[s]][i]+mean(datq$CSF_diff-datq$true_diff)
+#      RMSE_rsf_T[[s]][i]<-RMSE_rsf_T[[s]][i]+sqrt(mean((datq$rsf_T_diff-datq$true_diff)^2))
+#      RMSE_rsf_X[[s]][i]<-RMSE_rsf_X[[s]][i]+sqrt(mean((datq$rsf_X_diff-datq$true_diff)^2))
+#      RMSE_baft_T[[s]][i]<-RMSE_baft_T[[s]][i]+sqrt(mean((datq$baft_T_diff-datq$true_diff)^2))
+#      RMSE_baft_X[[s]][i]<-RMSE_baft_X[[s]][i]+sqrt(mean((datq$baft_X_diff-datq$true_diff)^2))
+#      RMSE_weib[[s]][i]<-RMSE_weib[[s]][i]+sqrt(mean((datq$weib_diff-datq$true_diff)^2))
+#      RMSE_dnnsurv_T[[s]][i]<-RMSE_dnnsurv_T[[s]][i]+sqrt(mean((datq$deepsurv_T_diff-datq$true_diff)^2))
+#      RMSE_dnnsurv_X[[s]][i]<-RMSE_dnnsurv_X[[s]][i]+sqrt(mean((datq$deepsurv_X_diff-datq$true_diff)^2))
+#      RMSE_CSF[[s]][i]<-RMSE_CSF[[s]][i]+sqrt(mean((datq$CSF_diff-datq$true_diff)^2))
+#    }
+#    bias_rsf_T[[s]][i]=bias_rsf_T[[s]][i]/50
+#    bias_rsf_X[[s]][i]=bias_rsf_X[[s]][i]/50
+#    bias_baft_T[[s]][i]=bias_baft_T[[s]][i]/50
+#    bias_baft_X[[s]][i]=bias_baft_X[[s]][i]/50
+#    bias_weib[[s]][i]=bias_weib[[s]][i]/50
+#    bias_dnnsurv_T[[s]][i]=bias_dnnsurv_T[[s]][i]/50
+#    bias_dnnsurv_X[[s]][i]=bias_dnnsurv_X[[s]][i]/50
+#    bias_CSF[[s]][i]=bias_CSF[[s]][i]/50
+#    RMSE_rsf_T[[s]][i]=RMSE_rsf_T[[s]][i]/50
+#    RMSE_rsf_X[[s]][i]=RMSE_rsf_X[[s]][i]/50
+#    RMSE_baft_T[[s]][i]=RMSE_baft_T[[s]][i]/50
+#    RMSE_baft_X[[s]][i]=RMSE_baft_X[[s]][i]/50
+#    RMSE_weib[[s]][i]=RMSE_weib[[s]][i]/50
+#    RMSE_dnnsurv_T[[s]][i]=RMSE_dnnsurv_T[[s]][i]/50
+#    RMSE_dnnsurv_X[[s]][i]=RMSE_dnnsurv_X[[s]][i]/50
+#    RMSE_CSF[[s]][i]=RMSE_CSF[[s]][i]/50
+#  }
+#}
+#save(bias_rsf_T,bias_rsf_X,bias_baft_T,bias_baft_X,bias_weib,bias_dnnsurv_T,bias_dnnsurv_X,bias_CSF,RMSE_rsf_T,RMSE_rsf_X,RMSE_baft_T,RMSE_baft_X,RMSE_weib,RMSE_dnnsurv_T,RMSE_dnnsurv_X,RMSE_CSF,file =paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_bias_RMSE_summary.RData"))
+```
+
+Plot Figure 1:
+
+```{r message = F, warning = F}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_bias_RMSE_summary.RData"))
+par(mfrow=c(2,3))
+par(mar = c(2.4, 4.8, 2, 1.2))
+par(cex.lab=2)
+par(cex.axis=2)
+for(m in 1:3){
+  if (m==1){
+    boxplot(bias_rsf_T[[m]],bias_rsf_X[[m]],bias_baft_T[[m]],bias_baft_X[[m]],bias_dnnsurv_T[[m]],bias_dnnsurv_X[[m]],bias_CSF[[m]],bias_weib[[m]],xaxt="n",ylim=c(-0.12,0.12),cex.axis=2,ylab="Bias") #bias_rsf_X_xtype1[[m]],bias_rsf_X_xtype2[[m]],bias_rsf_X_xtype3[[m]],bias_rsf_X_xtype4[[m]], bias_baft_X_xtype1[[m]],bias_baft_X_xtype2[[m]],bias_baft_X_xtype3[[m]],bias_baft_X_xtype4[[m]]
+    abline(h=0,col="red",lty=2,lwd=2)
+    points(x=1,y=mean(bias_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(bias_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(bias_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(bias_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(bias_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(bias_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(bias_CSF[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=8,y=mean(bias_weib[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+    title(paste0("Scenario ",m),cex.main=2)
+  }else{
+    boxplot(bias_rsf_T[[m]],bias_rsf_X[[m]],bias_baft_T[[m]],bias_baft_X[[m]],bias_dnnsurv_T[[m]],bias_dnnsurv_X[[m]],bias_CSF[[m]],bias_weib[[m]],xaxt="n",ylim=c(-0.12,0.12),cex.axis=2) #bias_rsf_X_xtype1[[m]],bias_rsf_X_xtype2[[m]],bias_rsf_X_xtype3[[m]],bias_rsf_X_xtype4[[m]], bias_baft_X_xtype1[[m]],bias_baft_X_xtype2[[m]],bias_baft_X_xtype3[[m]],bias_baft_X_xtype4[[m]]
+    abline(h=0,col="red",lty=2,lwd=2)
+    points(x=1,y=mean(bias_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(bias_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(bias_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(bias_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(bias_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(bias_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(bias_CSF[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=8,y=mean(bias_weib[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+    title(paste0("Scenario ",m),cex.main=2)
+  }
+}
+# RMSE
+for(m in 1:3){
+  if (m==1){
+    boxplot(RMSE_rsf_T[[m]],RMSE_rsf_X[[m]],RMSE_baft_T[[m]],RMSE_baft_X[[m]],RMSE_dnnsurv_T[[m]],RMSE_dnnsurv_X[[m]],RMSE_CSF[[m]],RMSE_weib[[m]],ylim=c(0,0.25),cex.axis=2,ylab="Binned RMSE",names = c("R-T","R-X","B-T","B-X","D-T","D-X","CSF","Weib")) 
+    points(x=1,y=mean(RMSE_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(RMSE_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(RMSE_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(RMSE_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(RMSE_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(RMSE_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(RMSE_CSF[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=8,y=mean(RMSE_weib[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+  }else{
+    boxplot(RMSE_rsf_T[[m]],RMSE_rsf_X[[m]],RMSE_baft_T[[m]],RMSE_baft_X[[m]],RMSE_dnnsurv_T[[m]],RMSE_dnnsurv_X[[m]],RMSE_CSF[[m]],RMSE_weib[[m]],ylim=c(0,0.25),cex.axis=2,names = c("R-T","R-X","B-T","B-X","D-T","D-X","CSF","Weib")) 
+    points(x=1,y=mean(RMSE_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(RMSE_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(RMSE_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(RMSE_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(RMSE_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(RMSE_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(RMSE_CSF[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=8,y=mean(RMSE_weib[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+  }
+}
+```
+
+## Table 1
+
+This section reproduces prediction accuracy of each method (Table 1).
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 1 (upper panel of Table 1): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#random1.diff.all1 <- random1.diff.all[,c(2,4,7,9,11,12,16,13,14)]
+#random2.diff.all1 <- random2.diff.all[,c(2,4,7,9,11,12,16,13,14)]
+#random3.diff.all1 <- random3.diff.all[,c(2,4,7,9,11,12,16,13,14)]
+#random1<-list(random1.diff.all1,random2.diff.all1,random3.diff.all1)
+
+### random setting 1
+#library(tableone)
+#bimatrix.random1<-data.frame(matrix(rep(NA,10000*100*9),ncol=9))
+#for (i in 1:9){
+  #bimatrix.random1[,i]<-ifelse(random1[[1]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random1)<-colnames(random1[[1]])[1:9]
+#bimatrix.random1$sim<-random[[1]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*8),ncol=8)
+#for (i in 1:100){
+#  dat<-bimatrix.random1[which(bimatrix.random1$sim==i),]
+#  for (j in 1:8){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#     ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }} # in simu 8, 11, 41, 63, 83, predictions from CSF all >=0.
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X","BAFT_T","BAFT_X","DNNSurv_T","DNNSurv_X","CSF","Weib")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S1.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S1.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random1<-gather(data.frame(acc), method, value, RSF_T:Weib, factor_key=TRUE)
+ppv_long.random1<-gather(data.frame(ppv), method, value, RSF_T:Weib, factor_key=TRUE)
+npv_long.random1<-gather(data.frame(npv), method, value, RSF_T:Weib, factor_key=TRUE)
+sens_long.random1<-gather(data.frame(sens), method, value, RSF_T:Weib, factor_key=TRUE)
+spec_long.random1<-gather(data.frame(spec), method, value, RSF_T:Weib, factor_key=TRUE)
+fmeasure_long.random1<-gather(data.frame(fmeasure), method, value, RSF_T:Weib, factor_key=TRUE)
+statmat.random1<-data.frame(cbind(acc_long.random1,ppv_long.random1[,2],npv_long.random1[,2],sens_long.random1[,2],spec_long.random1[,2],fmeasure_long.random1[,2]))
+names(statmat.random1)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random1$acc<-statmat.random1$acc*100
+statmat.random1$ppv<-statmat.random1$ppv*100
+statmat.random1$npv<-statmat.random1$npv*100
+statmat.random1$sens<-statmat.random1$sens*100
+statmat.random1$spec<-statmat.random1$spec*100
+statmat.random1$fmeasure<-statmat.random1$fmeasure*100
+table_one.random1<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random1)
+table_one_matrix.random1<-print(table_one.random1)
+```
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 2 (middle panel of Table 1): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#library(tableone)
+#bimatrix.random2<-data.frame(matrix(rep(NA,10000*100*9),ncol=9))
+#for (i in 1:9){
+#  bimatrix.random2[,i]<-ifelse(random1[[2]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random2)<-colnames(random1[[2]])[1:9]
+#bimatrix.random2$sim<-random[[2]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*8),ncol=8)
+#for (i in 1:100){
+#  dat<-bimatrix.random2[which(bimatrix.random2$sim==i),]
+#  for (j in 1:8){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#      ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }}  # simulation 74 and 75: a lot of missing in weibull_diff, all other with numbers >0; in 33 simu, predictions from CSF all >=0.
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X","BAFT_T","BAFT_X","DNNSurv_T","DNNSurv_X","CSF","Weib")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S2.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S2.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random2<-gather(data.frame(acc), method, value, RSF_T:Weib, factor_key=TRUE)
+ppv_long.random2<-gather(data.frame(ppv), method, value, RSF_T:Weib, factor_key=TRUE)
+npv_long.random2<-gather(data.frame(npv), method, value, RSF_T:Weib, factor_key=TRUE)
+sens_long.random2<-gather(data.frame(sens), method, value, RSF_T:Weib, factor_key=TRUE)
+spec_long.random2<-gather(data.frame(spec), method, value, RSF_T:Weib, factor_key=TRUE)
+fmeasure_long.random2<-gather(data.frame(fmeasure), method, value, RSF_T:Weib, factor_key=TRUE)
+statmat.random2<-data.frame(cbind(acc_long.random2,ppv_long.random2[,2],npv_long.random2[,2],sens_long.random2[,2],spec_long.random2[,2],fmeasure_long.random2[,2]))
+names(statmat.random2)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random2$acc<-statmat.random2$acc*100
+statmat.random2$ppv<-statmat.random2$ppv*100
+statmat.random2$npv<-statmat.random2$npv*100
+statmat.random2$sens<-statmat.random2$sens*100
+statmat.random2$spec<-statmat.random2$spec*100
+statmat.random2$fmeasure<-statmat.random2$fmeasure*100
+table_one.random2<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random2)
+table_one_matrix.random2<-print(table_one.random2)
+```
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 3 (lower panel of Table 1): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#library(tableone)
+#bimatrix.random3<-data.frame(matrix(rep(NA,10000*100*9),ncol=9))
+#for (i in 1:9){
+#  bimatrix.random3[,i]<-ifelse(random1[[3]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random3)<-colnames(random1[[3]])[1:9]
+#bimatrix.random3$sim<-random[[3]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*8),ncol=8)
+#for (i in 1:100){
+#  dat<-bimatrix.random3[which(bimatrix.random3$sim==i),]
+#  for (j in 1:8){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#      ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }} # in many simulations, CATE predictions from CSF all >=0.
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X","BAFT_T","BAFT_X","DNNSurv_T","DNNSurv_X","CSF","Weib")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S3.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_weib_accuracy_summary_S3.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random3<-gather(data.frame(acc), method, value, RSF_T:Weib, factor_key=TRUE)
+ppv_long.random3<-gather(data.frame(ppv), method, value, RSF_T:Weib, factor_key=TRUE)
+npv_long.random3<-gather(data.frame(npv), method, value, RSF_T:Weib, factor_key=TRUE)
+sens_long.random3<-gather(data.frame(sens), method, value, RSF_T:Weib, factor_key=TRUE)
+spec_long.random3<-gather(data.frame(spec), method, value, RSF_T:Weib, factor_key=TRUE)
+fmeasure_long.random3<-gather(data.frame(fmeasure), method, value, RSF_T:Weib, factor_key=TRUE)
+statmat.random3<-data.frame(cbind(acc_long.random3,ppv_long.random3[,2],npv_long.random3[,2],sens_long.random3[,2],spec_long.random3[,2],fmeasure_long.random3[,2]))
+names(statmat.random3)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random3$acc<-statmat.random3$acc*100
+statmat.random3$ppv<-statmat.random3$ppv*100
+statmat.random3$npv<-statmat.random3$npv*100
+statmat.random3$sens<-statmat.random3$sens*100
+statmat.random3$spec<-statmat.random3$spec*100
+statmat.random3$fmeasure<-statmat.random3$fmeasure*100
+table_one.random3<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random3)
+table_one_matrix.random3<-print(table_one.random3)
+```
+
+## Figure 2
+
+This figure shows binned bias and RMSE when data is generated from standard logistic models under balanced design and scenario 1. Because the size of the intermediate results are too large, we have saved summarized biases and RMSEs from 100 simulations in "Simulations/intermediate_result_100simulations" folder.
+
+The following codes are examples for loading the predicted CATE on test datasets in 100 runs of the simulations. The codes are commented out because the result files are too large to be loaded for the manuscript submission. Please jump to the next chunk for loading summarized biases and RMSEs. We have saved intermediate results from 100 simulations in "Simulations/intermediate_result_100simulations" folder.
+
+Load predicted CATE from R-T, R-X, B-T, B-X, D-T, D-X and CSF when data is generated from standard logistic models under balanced design and scenario1:
+
+```{r message = F, warning = F, error=FALSE}
+#load(paste0(your_directory,"/intermediate_result_100simulations/logis_balanced_mediantt.RData"))
+
+#random1.diff$ID<-rep(1:10000,100)
+#random2.diff$ID<-rep(1:10000,100)
+#random3.diff$ID<-rep(1:10000,100)
+#random<-list(random1.diff,random2.diff,random3.diff)
+
+```
+
+Calculate binned bias and RMSE:
+
+```{r message = F, warning = F, error=FALSE}
+#RMSE_rsf_T<-RMSE_rsf_X<-RMSE_baft_T<-RMSE_baft_X<-RMSE_slogistic<-RMSE_weib<-RMSE_dnnsurv_T<-RMSE_dnnsurv_X<-list(rep(NA,100),rep(NA,100),rep(NA,100))
+#bias_rsf_T<-bias_rsf_X<-bias_baft_T<-bias_baft_X<-bias_slogistic<-bias_weib<-bias_dnnsurv_T<-bias_dnnsurv_X<-list(rep(NA,100),rep(NA,100),rep(NA,100))
+# random, setting 1 to setting 3
+#for (s in 1:3){
+#  for (i in 1:100){ # 100 runs of results
+#    dat<-random[[s]][which(random[[s]]$sim==i),]
+#    dat<-dat[order(dat$true_diff),]
+    
+#    quant<-quantile(dat$true_diff,probs=seq(0,1,length.out=51)) 
+    
+#    bias_rsf_T[[s]][i]<-0
+#    bias_rsf_X[[s]][i]<-0
+#    bias_baft_T[[s]][i]<-0
+#    bias_baft_X[[s]][i]<-0
+#    bias_slogistic[[s]][i]<-0
+#    bias_weib[[s]][i]<-0
+#    bias_dnnsurv_T[[s]][i]<-0
+#    bias_dnnsurv_X[[s]][i]<-0
+#    RMSE_rsf_T[[s]][i]<-0
+#    RMSE_rsf_X[[s]][i]<-0
+#    RMSE_baft_T[[s]][i]<-0
+#    RMSE_baft_X[[s]][i]<-0
+#    RMSE_slogistic[[s]][i]<-0
+#    RMSE_weib[[s]][i]<-0
+#    RMSE_dnnsurv_T[[s]][i]<-0
+#    RMSE_dnnsurv_X[[s]][i]<-0
+    
+#    for (j in 1:50){
+#      datq<-dat[which(dat$true_diff>=quant[j]&dat$true_diff<=quant[j+1]),]
+#      bias_rsf_T[[s]][i]<-bias_rsf_T[[s]][i]+mean(datq$rsf_T-datq$true_diff)
+#      bias_rsf_X[[s]][i]<-bias_rsf_X[[s]][i]+mean(datq$rsf_X_diff0-datq$true_diff)
+#      bias_baft_T[[s]][i]<-bias_baft_T[[s]][i]+mean(datq$baft_T-datq$true_diff)
+#      bias_baft_X[[s]][i]<-bias_baft_X[[s]][i]+mean(datq$baft_X_diff0-datq$true_diff)
+#      bias_slogistic[[s]][i]<-bias_slogistic[[s]][i]+mean(datq$slogis-datq$true_diff)
+#      bias_weib[[s]][i]<-bias_weib[[s]][i]+mean(datq$weib-datq$true_diff)
+#      bias_dnnsurv_T[[s]][i]<-bias_dnnsurv_T[[s]][i]+mean(datq$deepsurv_T-datq$true_diff)
+#      bias_dnnsurv_X[[s]][i]<-bias_dnnsurv_X[[s]][i]+mean(datq$deepsurv_X-datq$true_diff)
+#      RMSE_rsf_T[[s]][i]<-RMSE_rsf_T[[s]][i]+sqrt(mean((datq$rsf_T-datq$true_diff)^2))
+#      RMSE_rsf_X[[s]][i]<-RMSE_rsf_X[[s]][i]+sqrt(mean((datq$rsf_X_diff0-datq$true_diff)^2))
+#      RMSE_baft_T[[s]][i]<-RMSE_baft_T[[s]][i]+sqrt(mean((datq$baft_T-datq$true_diff)^2))
+#      RMSE_baft_X[[s]][i]<-RMSE_baft_X[[s]][i]+sqrt(mean((datq$baft_X_diff0-datq$true_diff)^2))
+#      RMSE_slogistic[[s]][i]<-RMSE_slogistic[[s]][i]+sqrt(mean((datq$slogis-datq$true_diff)^2))
+#      RMSE_weib[[s]][i]<-RMSE_weib[[s]][i]+sqrt(mean((datq$weib-datq$true_diff)^2))
+#      RMSE_dnnsurv_T[[s]][i]<-RMSE_dnnsurv_T[[s]][i]+sqrt(mean((datq$deepsurv_T-datq$true_diff)^2))
+#      RMSE_dnnsurv_X[[s]][i]<-RMSE_dnnsurv_X[[s]][i]+sqrt(mean((datq$deepsurv_X-datq$true_diff)^2))
+#    }
+#    bias_rsf_T[[s]][i]=bias_rsf_T[[s]][i]/50
+#    bias_rsf_X[[s]][i]=bias_rsf_X[[s]][i]/50
+#    bias_baft_T[[s]][i]=bias_baft_T[[s]][i]/50
+#    bias_baft_X[[s]][i]=bias_baft_X[[s]][i]/50
+#    bias_slogistic[[s]][i]=bias_slogistic[[s]][i]/50
+#    bias_weib[[s]][i]=bias_weib[[s]][i]/50
+#    bias_dnnsurv_T[[s]][i]=bias_dnnsurv_T[[s]][i]/50
+#    bias_dnnsurv_X[[s]][i]=bias_dnnsurv_X[[s]][i]/50
+#    RMSE_rsf_T[[s]][i]=RMSE_rsf_T[[s]][i]/50
+#    RMSE_rsf_X[[s]][i]=RMSE_rsf_X[[s]][i]/50
+#    RMSE_baft_T[[s]][i]=RMSE_baft_T[[s]][i]/50
+#    RMSE_baft_X[[s]][i]=RMSE_baft_X[[s]][i]/50
+#    RMSE_slogistic[[s]][i]=RMSE_slogistic[[s]][i]/50
+#    RMSE_weib[[s]][i]=RMSE_weib[[s]][i]/50
+#    RMSE_dnnsurv_T[[s]][i]=RMSE_dnnsurv_T[[s]][i]/50
+#    RMSE_dnnsurv_X[[s]][i]=RMSE_dnnsurv_X[[s]][i]/50
+#  }
+#}
+#save(bias_rsf_T,bias_rsf_X,bias_baft_T,bias_baft_X,bias_slogistic,bias_dnnsurv_T,bias_dnnsurv_X,bias_CSF,RMSE_rsf_T,RMSE_rsf_X,RMSE_baft_T,RMSE_baft_X,RMSE_slogistic,RMSE_dnnsurv_T,RMSE_dnnsurv_X,RMSE_CSF,file =paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_bias_RMSE_summary.RData"))
+
+```
+
+Plot Figure 2: 
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_bias_RMSE_summary.RData"))
+par(mfrow=c(2,3))
+par(mar = c(2.4, 4.8, 2, 1.2))
+par(cex.lab=2)
+par(cex.axis=2)
+for(m in 1:3){
+  if (m==1){
+    boxplot(bias_rsf_T[[m]],bias_rsf_X[[m]],bias_baft_T[[m]],bias_baft_X[[m]],bias_dnnsurv_T[[m]],bias_dnnsurv_X[[m]],bias_slogistic[[m]],xaxt="n",ylim=c(-0.12,0.12),cex.axis=2,ylab="Bias") #bias_rsf_X_xtype1_dependent[[m]],bias_rsf_X_xtype2_dependent[[m]],bias_rsf_X_xtype3_dependent[[m]],bias_rsf_X_xtype4_dependent[[m]],bias_baft_X_xtype1_dependent[[m]],bias_baft_X_xtype2_dependent[[m]],bias_baft_X_xtype3_dependent[[m]],bias_baft_X_xtype4_dependent[[m]]
+    abline(h=0,col="red",lty=2,lwd=2)
+    points(x=1,y=mean(bias_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(bias_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(bias_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(bias_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(bias_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(bias_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(bias_slogistic[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+    title(paste0("Scenario ",m),cex.main=2)
+  }else{
+    boxplot(bias_rsf_T[[m]],bias_rsf_X[[m]],bias_baft_T[[m]],bias_baft_X[[m]],bias_dnnsurv_T[[m]],bias_dnnsurv_X[[m]],bias_slogistic[[m]],xaxt="n",ylim=c(-0.12,0.12),cex.axis=2) #bias_rsf_X_xtype1_dependent[[m]],bias_rsf_X_xtype2_dependent[[m]],bias_rsf_X_xtype3_dependent[[m]],bias_rsf_X_xtype4_dependent[[m]],bias_baft_X_xtype1_dependent[[m]],bias_baft_X_xtype2_dependent[[m]],bias_baft_X_xtype3_dependent[[m]],bias_baft_X_xtype4_dependent[[m]]
+    abline(h=0,col="red",lty=2,lwd=2)
+    points(x=1,y=mean(bias_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(bias_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(bias_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(bias_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(bias_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(bias_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(bias_slogistic[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+    title(paste0("Scenario ",m),cex.main=2)
+  }
+}
+
+## plot bias and RMSE
+# RMSE
+for(m in 1:3){
+  if (m==1){
+    boxplot(RMSE_rsf_T[[m]],RMSE_rsf_X[[m]],RMSE_baft_T[[m]],RMSE_baft_X[[m]],RMSE_dnnsurv_T[[m]],RMSE_dnnsurv_X[[m]],RMSE_slogistic[[m]],ylim=c(0,0.25),cex.axis=2,ylab="Binned RMSE",names = c("R-T","R-X","B-T","B-X","D-T","D-X","Logistic"))#RMSE_rsf_X_xtype1_dependent[[m]],RMSE_rsf_X_xtype2_dependent[[m]],RMSE_rsf_X_xtype3_dependent[[m]],RMSE_rsf_X_xtype4_dependent[[m]],RMSE_baft_X_xtype1_dependent[[m]],RMSE_baft_X_xtype2_dependent[[m]],RMSE_baft_X_xtype3_dependent[[m]],RMSE_baft_X_xtype4_dependent[[m]]
+    points(x=1,y=mean(RMSE_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(RMSE_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(RMSE_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(RMSE_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(RMSE_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(RMSE_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(RMSE_slogistic[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+  }else{
+    boxplot(RMSE_rsf_T[[m]],RMSE_rsf_X[[m]],RMSE_baft_T[[m]],RMSE_baft_X[[m]],RMSE_dnnsurv_T[[m]],RMSE_dnnsurv_X[[m]],RMSE_slogistic[[m]],ylim=c(0,0.25),cex.axis=2,names = c("R-T","R-X","B-T","B-X","D-T","D-X","Logistic"))#RMSE_rsf_X_xtype1_dependent[[m]],RMSE_rsf_X_xtype2_dependent[[m]],RMSE_rsf_X_xtype3_dependent[[m]],RMSE_rsf_X_xtype4_dependent[[m]],RMSE_baft_X_xtype1_dependent[[m]],RMSE_baft_X_xtype2_dependent[[m]],RMSE_baft_X_xtype3_dependent[[m]],RMSE_baft_X_xtype4_dependent[[m]]
+    points(x=1,y=mean(RMSE_rsf_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=2,y=mean(RMSE_rsf_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=3,y=mean(RMSE_baft_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=4,y=mean(RMSE_baft_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=5,y=mean(RMSE_dnnsurv_T[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=6,y=mean(RMSE_dnnsurv_X[[m]]),col="darkslategrey",pch=19,cex=1.2)
+    points(x=7,y=mean(RMSE_slogistic[[m]],na.rm=T),col="darkslategrey",pch=19,cex=1.2)
+  }
+}
+
+```
+
+## Table 2
+
+This section reproduces prediction accuracy of each method (Table 2). Please run the last section (Figure 2 section) first.
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 1 (upper panel of Table 2): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#random1.diff <- random1.diff[,c(2:5,8:9,1,6,7)]
+#random2.diff <- random2.diff[,c(2:3,5:6,8:9,1,4,7)]
+#random3.diff <- random3.diff[,c(2:3,5:6,8:9,1,4,7)]
+#random<-list(random1.diff,random2.diff,random3.diff)
+
+#library(tableone)
+#bimatrix.random1<-data.frame(matrix(rep(NA,10000*100*8),ncol=8))
+#for (i in 1:8){
+#  bimatrix.random1[,i]<-ifelse(random[[1]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random1)<-colnames(random[[1]])[1:8]
+#bimatrix.random1$sim<-random[[1]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*7),ncol=7)
+#for (i in 1:100){
+#  dat<-bimatrix.random1[which(bimatrix.random1$sim==i),]
+#  for (j in 1:7){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#      ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }}
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X0","BAFT_T","BAFT_X0","DNNSurv_T","DNNSurv_X","Logis")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S1.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S1.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random1<-gather(data.frame(acc), method, value, RSF_T:Logis, factor_key=TRUE)
+ppv_long.random1<-gather(data.frame(ppv), method, value, RSF_T:Logis, factor_key=TRUE)
+npv_long.random1<-gather(data.frame(npv), method, value, RSF_T:Logis, factor_key=TRUE)
+sens_long.random1<-gather(data.frame(sens), method, value, RSF_T:Logis, factor_key=TRUE)
+spec_long.random1<-gather(data.frame(spec), method, value, RSF_T:Logis, factor_key=TRUE)
+fmeasure_long.random1<-gather(data.frame(fmeasure), method, value, RSF_T:Logis, factor_key=TRUE)
+statmat.random1<-data.frame(cbind(acc_long.random1,ppv_long.random1[,2],npv_long.random1[,2],sens_long.random1[,2],spec_long.random1[,2],fmeasure_long.random1[,2]))
+names(statmat.random1)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random1$acc<-statmat.random1$acc*100
+statmat.random1$ppv<-statmat.random1$ppv*100
+statmat.random1$npv<-statmat.random1$npv*100
+statmat.random1$sens<-statmat.random1$sens*100
+statmat.random1$spec<-statmat.random1$spec*100
+statmat.random1$fmeasure<-statmat.random1$fmeasure*100
+table_one.random1<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random1)
+table_one_matrix.random1<-print(table_one.random1)
+```
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 2 (middle panel of Table 2): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#library(tableone)
+#bimatrix.random2<-data.frame(matrix(rep(NA,10000*100*8),ncol=8))
+#for (i in 1:8){
+#  bimatrix.random2[,i]<-ifelse(random[[2]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random2)<-colnames(random[[2]])[1:8]
+#bimatrix.random2$sim<-random[[2]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*7),ncol=7)
+#for (i in 1:100){
+#  dat<-bimatrix.random2[which(bimatrix.random2$sim==i),]
+#  for (j in 1:7){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#      ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }} 
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X0","BAFT_T","BAFT_X0","DNNSurv_T","DNNSurv_X","Logis")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S2.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S2.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random2<-gather(data.frame(acc), method, value, RSF_T:Logis, factor_key=TRUE)
+ppv_long.random2<-gather(data.frame(ppv), method, value, RSF_T:Logis, factor_key=TRUE)
+npv_long.random2<-gather(data.frame(npv), method, value, RSF_T:Logis, factor_key=TRUE)
+sens_long.random2<-gather(data.frame(sens), method, value, RSF_T:Logis, factor_key=TRUE)
+spec_long.random2<-gather(data.frame(spec), method, value, RSF_T:Logis, factor_key=TRUE)
+fmeasure_long.random2<-gather(data.frame(fmeasure), method, value, RSF_T:Logis, factor_key=TRUE)
+statmat.random2<-data.frame(cbind(acc_long.random2,ppv_long.random2[,2],npv_long.random2[,2],sens_long.random2[,2],spec_long.random2[,2],fmeasure_long.random2[,2]))
+names(statmat.random2)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random2$acc<-statmat.random2$acc*100
+statmat.random2$ppv<-statmat.random2$ppv*100
+statmat.random2$npv<-statmat.random2$npv*100
+statmat.random2$sens<-statmat.random2$sens*100
+statmat.random2$spec<-statmat.random2$spec*100
+statmat.random2$fmeasure<-statmat.random2$fmeasure*100
+table_one.random2<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random2)
+table_one_matrix.random2<-print(table_one.random2)
+```
+
+The following codes require to load the predictions on test dataset for 100 time of simulations. Since the result file is too large, we have summarize the accuracy measures. Please jump to the next chunk to run the summary table. 
+
+Scenario 3 (lower panel of Table 2): (The message "Error at i= " below means the simulation which CSF predicted all CATE > 0. We have mentioned this in the Results section in the main text.)
+
+```{r message = F, warning = F, error=FALSE}
+#library(tableone)
+#bimatrix.random3<-data.frame(matrix(rep(NA,10000*100*8),ncol=8))
+#for (i in 1:8){
+#  bimatrix.random3[,i]<-ifelse(random[[3]][,i]>=0,1,0) 
+#}
+#colnames(bimatrix.random3)<-colnames(random[[3]])[1:8]
+#bimatrix.random3$sim<-random[[3]]$sim
+#acc<-ppv<-npv<-sens<-spec<-fmeasure<-matrix(rep(NA,100*7),ncol=7)
+#for (i in 1:100){
+#  dat<-bimatrix.random3[which(bimatrix.random3$sim==i),]
+#  for (j in 1:7){
+#    tryCatch({
+#      metrics<-table(dat[,j],dat$true_diff)
+#      tn<-metrics[1,1]
+#      tp<-metrics[2,2]
+#      fn<-metrics[1,2]
+#      fp<-metrics[2,1]
+#      acc[i,j]<-(tn+tp)/(tn+tp+fn+fp)
+#      ppv[i,j]<-tp/(tp+fp)
+#      npv[i,j]<-tn/(tn+fn)
+#      sens[i,j]<-tp/(tp+fn)
+#      spec[i,j]<-tn/(tn+fp)
+#      fmeasure[i,j]<-2*tp/(2*tp+fp+fn)}
+#      ,error=function(e){
+#        print(paste("Error at i=",i,j))
+#      })
+#  }}
+#colnames(acc)<-colnames(ppv)<-colnames(npv)<-colnames(sens)<-colnames(spec)<-colnames(fmeasure)<-c("RSF_T","RSF_X0","BAFT_T","BAFT_X0","DNNSurv_T","DNNSurv_X","Logis")
+#save(acc, ppv, npv, sens,spec,fmeasure,file = paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S3.RData"))
+```
+
+```{r message = F, warning = F, error=FALSE}
+load(paste0(your_directory,"/intermediate_result_100simulations/simulation_logis_accuracy_summary_S3.RData"))
+library(tidyr)
+library(tableone)
+acc_long.random3<-gather(data.frame(acc), method, value, RSF_T:Logis, factor_key=TRUE)
+ppv_long.random3<-gather(data.frame(ppv), method, value, RSF_T:Logis, factor_key=TRUE)
+npv_long.random3<-gather(data.frame(npv), method, value, RSF_T:Logis, factor_key=TRUE)
+sens_long.random3<-gather(data.frame(sens), method, value, RSF_T:Logis, factor_key=TRUE)
+spec_long.random3<-gather(data.frame(spec), method, value, RSF_T:Logis, factor_key=TRUE)
+fmeasure_long.random3<-gather(data.frame(fmeasure), method, value, RSF_T:Logis, factor_key=TRUE)
+statmat.random3<-data.frame(cbind(acc_long.random3,ppv_long.random3[,2],npv_long.random3[,2],sens_long.random3[,2],spec_long.random3[,2],fmeasure_long.random3[,2]))
+names(statmat.random3)[2:7]<-c("acc","ppv","npv","sens","spec","fmeasure")
+statmat.random3$acc<-statmat.random3$acc*100
+statmat.random3$ppv<-statmat.random3$ppv*100
+statmat.random3$npv<-statmat.random3$npv*100
+statmat.random3$sens<-statmat.random3$sens*100
+statmat.random3$spec<-statmat.random3$spec*100
+statmat.random3$fmeasure<-statmat.random3$fmeasure*100
+table_one.random3<-CreateTableOne(vars=c("acc","ppv","npv","sens","spec","fmeasure"),strata="method",data=statmat.random3)
+table_one_matrix.random3<-print(table_one.random3)
+```
