@@ -1,0 +1,855 @@
+---
+title: "Real Data Analysis"
+author: "Na Bo and Yue Wei"
+output:
+  bookdown::html_document2:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    fig_caption: yes
+    fig_width: 6
+    fig_height: 4
+    code_folding: hide
+---
+
+This file gives codes of real data analysis and reproducing plots and tables. The following contents are organized as:\
+section 1: AREDS data analysis. We provide example code of running R-T, R-X, B-T, B-X, D-T, D-X and CSF. But since we do not provide full real data, we will commented these codes out and load intermediate results to reproduce plots and tables in the manuscript.
+
+section 2: AREDS2 data analysis. We provide example code of running R-T, R-X, B-T, B-X, D-T, D-X and CSF. But since we do not provide full real data, we will commented these codes out and load intermediate results to reproduce plots and tables in the manuscript.
+
+Please set up your working directory using code: your_directory <- setwd("Your directory of 'RealDataAnalysis' folder").
+```{r  echo=FALSE}
+#your_directory <- setwd("Your directory of 'RealDataAnalysis' folder")
+```
+
+# AREDS data analysis
+
+This section provides example codes of running R-T, R-X, B-T, B-X, D-T, D-X and CSF and intermediate results to reproduce plots and tables in the manuscript.
+
+## Example code of running R-T, R-X, B-T, B-X, D-T, D-X and CSF in real data
+
+We give an example code of running R-T, R-X, B-T, B-X, D-T, D-X and CSF on AREDS data when time of interest is 5 years. Since we do not share the full dataset, codes in this section are commented out and are served as an example of running functions on real data. 
+
+For 3 years, please change the "tt" in the following code.
+
+```{r  class.source = 'fold-show'}
+# time of interest
+#tt <- 5 # change time of interest
+```
+
+Change your working director using code: your_directory <- setwd("Your directory of folder 'RealDataAnalysis'")
+
+To run D-T and D-X in R, we call tensorflow in Python from R. It requires the following steps: \
+
+- Please install Anaconda on your computer. [Instructions can be found here:] (https://docs.anaconda.com/anaconda/install/index.html). \
+
+- In R, please install "reticulate", "tensorflow", and "keras" in R using the following codes if you haven't. 
+
+```{r  class.source = 'fold-show'}
+#install.packages("reticulate")
+#install.packages("tensorflow")
+#install.packages("keras")
+```
+
+- open terminal \
+- type: conda activate r-reticulate \
+- back to Rstudio \
+- type code: source("Your directory/DNNSurv_HTE_survival.R") \
+- Procedures might differ in Windows or mac systems. 
+
+Load packages and functions:
+
+```{r  class.source = 'fold-show'}
+### load packages and functions for calling Python in R
+# call tensorflow and keras
+#library(reticulate)
+#use_condaenv("r-reticulate")
+#library(tensorflow)
+#library(keras)
+
+# check if tensorflow is successfully called
+#tf$config$experimental_run_functions_eagerly(TRUE)
+#tf$constant("Hello Tensorflow")
+
+# check env of python, keras, numpy, tensorflow are under r-reticulate
+#py_config()
+#py_discover_config("keras")
+#py_discover_config("numpy")
+#py_discover_config("tensorflow")
+
+### load other packages and functions
+#library(survival)
+#library(BART)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(AFTrees)
+#library(mgcv)
+#library(Boruta)
+#source(paste0(your_directory,"/source_files/rsf_HTE_survival.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_SurvivalProb.R"))
+#source(paste0(your_directory,"/source_files/aft_bart_np_survival.R"))
+#source(paste0(your_directory,"/source_files/fun_util.R"))
+#source(paste0(your_directory,"/source_files/DNNSurv_HTE_survival.R"))
+```
+
+Load the dataset (data not provided):
+
+```{r  class.source = 'fold-show'}
+#load("AREDS.RData") # loaded data name is dat_noID.
+```
+
+Split data with three random splits (Plase install splitTools package if you haven't.):
+
+```{r  class.source = 'fold-show'}
+#install.packages("splitTools")
+```
+
+```{r  class.source = 'fold-show'}
+#library(splitTools)
+#set.seed(15213)
+#folds1<-create_folds(dat_noID$Treatment,k=4,type="stratified")
+#set.seed(130000)
+#folds2<-create_folds(dat_noID$Treatment,k=4,type="stratified")
+#set.seed(100871)
+#folds3<-create_folds(dat_noID$Treatment,k=4,type="stratified")
+#folds<-list(folds1,folds2,folds3)
+```
+
+The following codes are examples of running 4-fold CV for three splits using R-T, R-X, B-T, B-X, D-T, D-X and CSF at time.interest=5. 
+
+```{r  class.source = 'fold-show'}
+#rsf_Tmid<-rsf_Xmid<-baft_Tmid<-baft_Xmid<-deepsurv_Tmid<-deepsurv_Xmid<-NULL
+#rsf_T<-rsf_X<-baft_T<-baft_X<-deepsurv_T<-deepsurv_X<-vector(mode = "list", length = 3)
+#ID<-c(1:806)
+
+# R-T, R-X, B-T, B-X, D-T, D-X
+#for (i in 1:3){
+#  for (j in 1:4){
+#    rsf_t<-rsf_HTE_T(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5)
+#    rsf_x<-rsf_HTE_X(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5,ntrees=1000)
+#    baft_t<-baft_HTE_T(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5)
+#    baft_x<-baft_HTE_X(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5,ntrees=1000)
+#    deepsurv_t<-DNNsurv_HTE_T(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5)
+#    deepsurv_x<-DNNsurv_HTE_X(data=dat_noID[folds[[i]][[j]],],testdat=dat_noID[-folds[[i]][[j]],],time.interest = 5,ntrees=1000)
+#    ID1<-ID[-folds[[i]][[j]]]
+#    rsf_Tmid<-rbind(rsf_Tmid,cbind(ID1,rsf_t$diff))
+#    rsf_Xmid<-rbind(rsf_Xmid,cbind(ID1,rsf_x$diff))
+#    baft_Tmid<-rbind(baft_Tmid,cbind(ID1,baft_t$diff))
+#    baft_Xmid<-rbind(baft_Xmid,cbind(ID1,baft_x$diff))
+#    deepsurv_Tmid<-rbind(deepsurv_Tmid,cbind(ID1,deepsurv_t$diff))
+#    deepsurv_Xmid<-rbind(deepsurv_Xmid,cbind(ID1,deepsurv_x$diff))
+#  }
+#  rsf_T[[i]]<-rsf_Tmid[,2][order(rsf_Tmid[,1])]
+#  rsf_X[[i]]<-rsf_Xmid[,2][order(rsf_Xmid[,1])]
+#  baft_T[[i]]<-baft_Tmid[,2][order(baft_Tmid[,1])]
+#  baft_X[[i]]<-baft_Xmid[,2][order(baft_Xmid[,1])]
+#  deepsurv_T[[i]]<-deepsurv_Tmid[,2][order(deepsurv_Tmid[,1])]
+#  deepsurv_X[[i]]<-deepsurv_Xmid[,2][order(deepsurv_Xmid[,1])]
+#  rsf_Tmid<-rsf_Xmid<-baft_Tmid<-baft_Xmid<-deepsurv_Tmid<-deepsurv_Xmid<-NULL
+#}
+
+#save(deepsurv_T,file=paste0(your_directory,"/intermediate_result/deepsurv_T_5Yrs.RData"))
+#save(deepsurv_X,file=paste0(your_directory,"/intermediate_result/deepsurv_X_5Yrs.RData"))
+#save(rsf_T,rsf_X,baft_T,baft_X,baft_X1,file=paste0(your_directory,"/intermediate_result/rsf_baft_results_5Yrs.RData"))
+
+# CSF
+#library(grf)
+#for (i in 1:3){
+#  for (j in 1:4){
+#    csf<-causal_survival_forest(dat_noID[folds[[i]][[j]],-which(names(dat_noID)%in%c("Time","Event","Treatment"))],dat_noID[folds[[i]][[j]],which(names(dat_noID)%in%c("Time"))],dat_noID[folds[[i]][[j]],which(names(dat_noID)%in%c("Treatment"))],dat_noID[folds[[i]][[j]],which(names(dat_noID)%in%c("Event"))],target = "survival.probability",horizon = 5,num.trees = 500,mtry = (10/3),min.node.size = 15,num.threads=1)
+#    csf_diff= predict(csf,dat_noID[-folds[[i]][[j]],-which(names(dat_noID)%in%c("Time","Event","Treatment"))])
+#    ID1<-ID[-folds[[i]][[j]]]
+#    csf_mid<-rbind(csf_mid,cbind(ID1,csf_diff))
+#  }
+#  csf_result[[i]]<-csf_mid[,2][order(csf_mid[,1])]
+#  csf_mid<-NULL
+#}
+#save(csf_result,file=paste0(your_directory,"/intermediate_result/csf_5Yrs.RData"))
+```
+
+## Example code of variable importance
+
+Since we do not share the full data, the following codes give an example of variable importance based on treatment recommendation from D-X, using Boruta algorithm in section 4.3 of the manuscript. Annotated intermediate results are saved under "RealDataAnalysis/intermediate_result". We also save CE4 SNP names under "RealDataAnalysis/intermediate_result/ce4SNPs.RData".
+
+Install Boruta package if you haven't:
+
+```{r  class.source = 'fold-show'}
+#install.packages("Boruta")
+```
+
+Load Boruta:
+
+```{r  class.source = 'fold-show'}
+#library(Boruta)
+```
+
+Run Boruta in 3 splits of the data:
+
+```{r  class.source = 'fold-show'}
+#dat_noID$target1DNNsurvX<-ifelse(deepsurv_X[[1]]>=0,1,0)
+#dat_noID$target2DNNsurvX<-ifelse(deepsurv_X[[2]]>=0,1,0)
+#dat_noID$target3DNNsurvX<-ifelse(deepsurv_X[[3]]>=0,1,0)
+#colnames(dat_noID)[695:697] <- c("target1","target2","target3")
+
+#dat_rf1<-dat_noID[,c(1:6,9:695)]
+#dat_rf2<-dat_noID[,c(1:6,9:694,696)]
+#dat_rf3<-dat_noID[,c(1:6,9:694,697)]
+
+#library(Boruta)
+#set.seed(15213)
+#boruta1<-Boruta(as.factor(target1)~.,data=dat_rf1,getImp=getImpRfZ)
+#boruta2<-Boruta(as.factor(target2)~.,data=dat_rf2,getImp=getImpRfZ)
+#boruta3<-Boruta(as.factor(target3)~.,data=dat_rf3,getImp=getImpRfZ)
+
+#check1<-attStats(boruta1)
+#check2<-attStats(boruta2)
+#check3<-attStats(boruta3)
+
+#top_var1 <- check1[which(check1$decision=="Confirmed"),]
+#top_var1 <- top_var1[order(top_var1$meanImp,decreasing = T),]
+#top_var1 <- cbind(rownames(top_var1),top_var1)
+#colnames(top_var1)[1] <- "SNP"
+#plot(boruta1)
+
+#top_var2 <- check2[which(check2$decision=="Confirmed"),]
+#top_var2 <- top_var2[order(top_var2$meanImp,decreasing = T),]
+#top_var2 <- cbind(rownames(top_var2),top_var2)
+#colnames(top_var2)[1] <- "SNP"
+
+#top_var3 <- check3[which(check3$decision=="Confirmed"),]
+#top_var3 <- top_var3[order(top_var3$meanImp,decreasing = T),]
+#top_var3 <- cbind(rownames(top_var3),top_var3)
+#colnames(top_var3)[1] <- "SNP"
+
+# save Boruta intermediate results
+#require(openxlsx)
+#list_of_datasets <- list("split1" = top_var1, "split2" = top_var2,"split3" = top_var3)
+#write.xlsx(list_of_datasets, file = "Your directory/Boruta_DNNsurv_X5Yrs.xlsx")
+
+# This is the code for annotating SNPs. Since we do not provide annotation, we provide example code here.
+#top_var1_annotated <- merge(annotation.freq,top_var1,by.x = "SNP",by.y = "SNP",all.y  = T)
+#top_var2_annotated <- merge(annotation.freq,top_var2,by.x = "SNP",by.y = "SNP",all.y  = T)
+#top_var3_annotated <- merge(annotation.freq,top_var3,by.x = "SNP",by.y = "SNP",all.y  = T)
+
+# save annotated Boruta intermediate results
+#require(openxlsx)
+#list_of_datasets2 <- list("split1" = top_var1_annotated, "split2" = top_var2_annotated,"split3" = top_var3_annotated)
+#write.xlsx(list_of_datasets2, file = "/Users/nab177/Box/DeepSubgroup/Survival/RealDatResults/AREDS_5Yrs/Boruta_DNNsurv_X_annotated.xlsx")
+
+# save CE4 SNP names
+#ce4SNPs<-colnames(dat_noID)[9:54]
+#save(ce4SNPs,file =paste0(your_directory,"/intermediate_result/ce4SNPs.RData" ))
+```
+
+## Reproduce tables and figures in the manuscript
+
+This section provides codes for reproducing tables and figures in the manuscript. We have saved intermediate results (predicted CATE) under "RealDataAnalysis/intermediate_result" folder. As we do not provide full real data, figures and tables can be reproduced by loading intermediate results.
+
+Please install the following packages if you haven't :
+
+```{r  class.source = 'fold-show'}
+#install.packages("survival")
+#install.packages(RColorBrewer)
+```
+
+Load packages:
+
+```{r  class.source = 'fold-show'}
+library(survival)
+library(RColorBrewer)
+```
+
+### Figure 3
+
+Mean treatment effect in RT and RC group in 3 splits at year 5:
+
+```{r  }
+# time of interest
+tt <- 5
+
+# load results of time=5
+load(paste0(your_directory,"/intermediate_result/rsf_baft_results_5Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/deepsurv_T_5Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/deepsurv_X_5Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/csf_5Yrs.RData"))
+
+# load shared data
+load(paste0(your_directory,"/data/AREDS_shared.RData"))
+
+# RT group
+rsf_T_KM<-rsf_X_KM<-baft_T_KM<-baft_X_KM<-baft_X1_KM<-deepsurv_T_KM<-deepsurv_X_KM<-csf_KM<-vector(mode = "list", length = 3)
+rsf_T_KMse<-rsf_X_KMse<-baft_T_KMse<-baft_X_KMse<-baft_X1_KMse<-deepsurv_T_KMse<-deepsurv_X_KMse<-csf_KMse<-vector(mode = "list", length = 3)
+rsf_T_KMno<-rsf_X_KMno<-baft_T_KMno<-baft_X_KMno<-baft_X1_KMno<-deepsurv_T_KMno<-deepsurv_X_KMno<-csf_KMno<-vector(mode = "list", length = 3)
+rsf_T_KMnose<-rsf_X_KMnose<-baft_T_KMnose<-baft_X_KMnose<-baft_X1_KMnose<-deepsurv_T_KMnose<-deepsurv_X_KMnose<-csf_KMnose<-vector(mode = "list", length = 3)
+
+for (i in 1:3){
+  rsfT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_T[[i]]>=0),]), times = tt)
+  rsf_T_KM[[i]]<-rsfT$surv[2]-rsfT$surv[1]
+  rsf_T_KMse[[i]]<-sqrt(rsfT$std.err[2]^2+rsfT$std.err[1]^2)
+  rsfX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_X[[i]]>=0),]), times = tt)
+  rsf_X_KM[[i]]<-rsfX$surv[2]-rsfX$surv[1] 
+  rsf_X_KMse[[i]]<-sqrt(rsfX$std.err[2]^2+rsfX$std.err[1]^2) 
+  baftT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_T[[i]]>=0),]), times = tt)
+  baft_T_KM[[i]]<-baftT$surv[2]-baftT$surv[1]
+  baft_T_KMse[[i]]<-sqrt(baftT$std.err[2]^2+baftT$std.err[1]^2)
+  baftX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_X[[i]]>=0),]), times = tt)
+  baft_X_KM[[i]]<-baftX$surv[2]-baftX$surv[1]
+  baft_X_KMse[[i]]<-sqrt(baftX$std.err[2]^2+baftX$std.err[1]^2)
+  deepsurvT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(deepsurv_T[[i]]>=0),]), times = tt)
+  deepsurv_T_KM[[i]]<-deepsurvT$surv[2]-deepsurvT$surv[1]
+  deepsurv_T_KMse[[i]]<-sqrt(deepsurvT$std.err[2]^2+deepsurvT$std.err[1]^2)
+  deepsurvX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(deepsurv_X[[i]]>=0),]), times = tt)
+  deepsurv_X_KM[[i]]<-deepsurvX$surv[2]-deepsurvX$surv[1]
+  deepsurv_X_KMse[[i]]<-sqrt(deepsurvX$std.err[2]^2+deepsurvX$std.err[1]^2)
+  csf_surv<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(csf_result[[i]]>=0),]), times = 5)
+  csf_KM[[i]]<-csf_surv$surv[2]-csf_surv$surv[1]
+  csf_KMse[[i]]<-sqrt(csf_surv$std.err[2]^2+csf_surv$std.err[1]^2)
+}
+
+# RC group
+for(i in 1:3){
+  rsfTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_T[[i]]<0),]), times = tt)
+  rsf_T_KMno[[i]]<-rsfTno$surv[2]-rsfTno$surv[1]
+  rsf_T_KMnose[[i]]<-sqrt(rsfTno$std.err[2]^2+rsfTno$std.err[1]^2)
+  rsfXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_X[[i]]<0),]), times = tt)
+  rsf_X_KMno[[i]]<-rsfXno$surv[2]-rsfXno$surv[1] 
+  rsf_X_KMnose[[i]]<-sqrt(rsfXno$std.err[2]^2+rsfXno$std.err[1]^2) 
+  baftTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_T[[i]]<0),]), times = tt)
+  baft_T_KMno[[i]]<-baftTno$surv[2]-baftTno$surv[1]
+  baft_T_KMnose[[i]]<-sqrt(baftTno$std.err[2]^2+baftTno$std.err[1]^2)
+  baftXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_X[[i]]<0),]), times = tt)
+  baft_X_KMno[[i]]<-baftXno$surv[2]-baftXno$surv[1]
+  baft_X_KMnose[[i]]<-sqrt(baftXno$std.err[2]^2+baftXno$std.err[1]^2)
+  deepsurvTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(deepsurv_T[[i]]<0),]), times = tt)
+  deepsurv_T_KMno[[i]]<-deepsurvTno$surv[2]-deepsurvTno$surv[1]
+  deepsurv_T_KMnose[[i]]<-sqrt(deepsurvTno$std.err[2]^2+deepsurvTno$std.err[1]^2)
+  deepsurvXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(deepsurv_X[[i]]<0),]), times = tt)
+  deepsurv_X_KMno[[i]]<-deepsurvXno$surv[2]-deepsurvXno$surv[1]
+  deepsurv_X_KMnose[[i]]<-sqrt(deepsurvXno$std.err[2]^2+deepsurvXno$std.err[1]^2)
+  csf_survno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(csf_result[[i]]<0),]), times = 5)
+  csf_KMno[[i]]<-csf_survno$surv[2]-csf_survno$surv[1]
+  csf_KMnose[[i]]<-sqrt(csf_survno$std.err[2]^2+csf_survno$std.err[1]^2)
+}
+
+allcombined<-c(unlist(rsf_T_KM),unlist(rsf_X_KM),unlist(baft_T_KM),unlist(baft_X_KM),unlist(deepsurv_T_KM),unlist(deepsurv_X_KM),unlist(csf_KM))
+allcombinedse<-c(unlist(rsf_T_KMse),unlist(rsf_X_KMse),unlist(baft_T_KMse),unlist(baft_X_KMse),unlist(deepsurv_T_KMse),unlist(deepsurv_X_KMse),unlist(csf_KMse))
+
+allcombined_no<-c(unlist(rsf_T_KMno),unlist(rsf_X_KMno),unlist(baft_T_KMno),unlist(baft_X_KMno),unlist(deepsurv_T_KMno),unlist(deepsurv_X_KMno),unlist(csf_KMno))
+allcombined_nose<-c(unlist(rsf_T_KMnose),unlist(rsf_X_KMnose),unlist(baft_T_KMnose),unlist(baft_X_KMnose),unlist(deepsurv_T_KMnose),unlist(deepsurv_X_KMnose),unlist(csf_KMnose))
+
+```
+
+Overall mean treatment effect:
+
+```{r}
+fall <- survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared)
+allresults<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared), times = tt)
+meandiff<-allresults$surv[2]-allresults$surv[1]
+meandiffse<-sqrt(allresults$std.err[2]^2+allresults$std.err[1]^2)
+```
+
+Figure 3:
+
+```{r}
+colorcheck<-brewer.pal(4,"Set2")
+par(mfrow=c(2,1))
+par(mar = c(2, 6, 1.2, 1.5))
+par(cex.lab=0.65)
+par(cex.axis=0.65)
+plotss<-barplot(height=c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]),names=c("Overall",rep(c("RSF-T","RSF-X","BAFT-T","BAFT-X","DNNSurv-T","DNNSurv-X","CSF"),3)),col=c(colorcheck[4],rep(colorcheck[1],7),rep(colorcheck[2],7),rep(colorcheck[3],7)),las=2,ylim=c(-0.05,0.25),cex.axis=0.65)
+legend(x="topleft",fill=c(colorcheck[4],colorcheck[1],colorcheck[2],colorcheck[3]),legend = c("Overall ATE","split 1","split 2","split 3"),cex=0.65,bty = "n")
+segments(plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+         plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1)
+arrows(plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+       plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1, angle = 90,code = 3, length = 0.05)
+plotss<-barplot(height=c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]),names=c("Overall",rep(c("RSF-T","RSF-X","BAFT-T","BAFT-X","DNNSurv-T","DNNSurv-X","CSF"),3)),col=c(colorcheck[4],rep(colorcheck[1],7),rep(colorcheck[2],7),rep(colorcheck[3],7)), las=2,ylim=c(-0.27,0.03),xaxt="n")
+segments(plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+         plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1,col="black")
+arrows(plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+       plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1, angle = 90,col="black",code = 3, length = 0.05)
+```
+
+The bars under split1 shows results in Figure 3; the bars under split2 and split3 shows results in Web Figure 7.
+
+### Variable importance (time of interest=5)
+
+This section reproduces variable importance results in section 4.3 of the manuscript, using Boruta algorithm when treatment recommendation is based on D-X. 
+
+As we do not share the full data, we give an example code of reproducing the results in section 4.3 of the manuscript by loading intermediate results, which is saved under "RealDataAnalysis/intermediate_result":
+
+Load intermediate results:
+
+```{r}
+# load Borura algorithm results
+library(readxl)
+Boruta_DNNsurv_X5Yrs_split1 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split1")
+Boruta_DNNsurv_X5Yrs_split2 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split2")
+Boruta_DNNsurv_X5Yrs_split3 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split3")
+
+# load CE4 SNP names:
+load(paste0(your_directory,"/intermediate_result/ce4SNPs.RData"))
+```
+
+Number of important features in split 1 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X5Yrs_split1$SNP,ce4SNPs)) 
+```
+
+Number of important features in split 2 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X5Yrs_split2$SNP,ce4SNPs)) 
+```
+
+Number of important features in split 3 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X5Yrs_split3$SNP,ce4SNPs)) 
+```
+
+Important features across 3 splits:
+
+```{r echo=FALSE}
+overlap<-intersect(Boruta_DNNsurv_X5Yrs_split1$SNP,intersect(Boruta_DNNsurv_X5Yrs_split2$SNP,Boruta_DNNsurv_X5Yrs_split3$SNP))
+length(intersect(overlap,ce4SNPs))
+overlap
+```
+
+### Table 3 (upper panel)
+
+This section reproduces genetic profile (Table 3 upper panel). Partial data shared is saved under "RealDataAnalysis/data".
+
+Install "Table1" package if you haven't:
+
+```{r }
+#library(devtools)
+#install_github("emwozniak/Table1")
+```
+
+Load library:
+
+```{r echo=FALSE}
+library(tableone)
+```
+
+Load shared data:
+
+```{r}
+load(paste0(your_directory,"/data/AREDS_shared.RData"))
+```
+
+Table 3 (Upper panel) with Chi-squared tests: (0: AA; 1:Aa; 2:aa)
+
+```{r}
+load(paste0(your_directory,"/intermediate_result/deepsurv_X_5Yrs.RData"))
+AREDS_shared$target1DNNsurvX<-ifelse(deepsurv_X[[1]]>=0,1,0)
+
+catVars <- c("rs1245576", "rs8109218","rs147106198")
+
+# Overall column
+tab1 <- CreateTableOne(vars = catVars, data = AREDS_shared, factorVars = catVars)
+tab1
+# RT, RC and p columns
+tab2 <- CreateTableOne(vars = catVars, strata = "target1DNNsurvX" , data = AREDS_shared, factorVars = catVars)
+print(tab2, showAllLevels = TRUE,formatOptions = list(big.mark = ","))
+```
+
+
+### Results when time of interests = 3 years
+
+Mean treatment effect in RT and RC group in 3 splits at year 3:
+
+```{r  }
+# time of interest
+tt <- 3
+
+# load results of time=3
+load(paste0(your_directory,"/intermediate_result/rsf_baft_results_3Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/D_T_result_3Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/D_X_result_3Yrs.RData"))
+load(paste0(your_directory,"/intermediate_result/csf_3Yrs.RData"))
+
+# load shared data
+load(paste0(your_directory,"/data/AREDS_shared.RData"))
+
+# RT group
+rsf_T_KM<-rsf_X_KM<-baft_T_KM<-baft_X_KM<-baft_X1_KM<-deepsurv_T_KM<-deepsurv_X_KM<-csf_KM<-vector(mode = "list", length = 3)
+rsf_T_KMse<-rsf_X_KMse<-baft_T_KMse<-baft_X_KMse<-baft_X1_KMse<-deepsurv_T_KMse<-deepsurv_X_KMse<-csf_KMse<-vector(mode = "list", length = 3)
+rsf_T_KMno<-rsf_X_KMno<-baft_T_KMno<-baft_X_KMno<-baft_X1_KMno<-deepsurv_T_KMno<-deepsurv_X_KMno<-csf_KMno<-vector(mode = "list", length = 3)
+rsf_T_KMnose<-rsf_X_KMnose<-baft_T_KMnose<-baft_X_KMnose<-baft_X1_KMnose<-deepsurv_T_KMnose<-deepsurv_X_KMnose<-csf_KMnose<-vector(mode = "list", length = 3)
+
+for (i in 1:3){
+  rsfT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_T[[i]]>=0),]), times = tt)
+  rsf_T_KM[[i]]<-rsfT$surv[2]-rsfT$surv[1]
+  rsf_T_KMse[[i]]<-sqrt(rsfT$std.err[2]^2+rsfT$std.err[1]^2)
+  rsfX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_X[[i]]>=0),]), times = tt)
+  rsf_X_KM[[i]]<-rsfX$surv[2]-rsfX$surv[1] 
+  rsf_X_KMse[[i]]<-sqrt(rsfX$std.err[2]^2+rsfX$std.err[1]^2) 
+  baftT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_T[[i]]>=0),]), times = tt)
+  baft_T_KM[[i]]<-baftT$surv[2]-baftT$surv[1]
+  baft_T_KMse[[i]]<-sqrt(baftT$std.err[2]^2+baftT$std.err[1]^2)
+  baftX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_X[[i]]>=0),]), times = tt)
+  baft_X_KM[[i]]<-baftX$surv[2]-baftX$surv[1]
+  baft_X_KMse[[i]]<-sqrt(baftX$std.err[2]^2+baftX$std.err[1]^2)
+  deepsurvT<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(D_T_result[[i]]>=0),]), times = tt)
+  deepsurv_T_KM[[i]]<-deepsurvT$surv[2]-deepsurvT$surv[1]
+  deepsurv_T_KMse[[i]]<-sqrt(deepsurvT$std.err[2]^2+deepsurvT$std.err[1]^2)
+  deepsurvX<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(D_X_result[[i]]>=0),]), times = tt)
+  deepsurv_X_KM[[i]]<-deepsurvX$surv[2]-deepsurvX$surv[1]
+  deepsurv_X_KMse[[i]]<-sqrt(deepsurvX$std.err[2]^2+deepsurvX$std.err[1]^2)
+  csf<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(csf_result[[i]]>=0),]), times = tt)
+  csf_KM[[i]]<-csf$surv[2]-csf$surv[1]
+  csf_KMse[[i]]<-sqrt(csf$std.err[2]^2+csf$std.err[1]^2)
+}
+
+# RC group
+for(i in 1:3){
+  rsfTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_T[[i]]<0),]), times = tt)
+  rsf_T_KMno[[i]]<-rsfTno$surv[2]-rsfTno$surv[1]
+  rsf_T_KMnose[[i]]<-sqrt(rsfTno$std.err[2]^2+rsfTno$std.err[1]^2)
+  rsfXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(rsf_X[[i]]<0),]), times = tt)
+  rsf_X_KMno[[i]]<-rsfXno$surv[2]-rsfXno$surv[1] 
+  rsf_X_KMnose[[i]]<-sqrt(rsfXno$std.err[2]^2+rsfXno$std.err[1]^2) 
+  baftTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_T[[i]]<0),]), times = tt)
+  baft_T_KMno[[i]]<-baftTno$surv[2]-baftTno$surv[1]
+  baft_T_KMnose[[i]]<-sqrt(baftTno$std.err[2]^2+baftTno$std.err[1]^2)
+  baftXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(baft_X[[i]]<0),]), times = tt)
+  baft_X_KMno[[i]]<-baftXno$surv[2]-baftXno$surv[1]
+  baft_X_KMnose[[i]]<-sqrt(baftXno$std.err[2]^2+baftXno$std.err[1]^2)
+  deepsurvTno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(D_T_result[[i]]<0),]), times = tt)
+  deepsurv_T_KMno[[i]]<-deepsurvTno$surv[2]-deepsurvTno$surv[1]
+  deepsurv_T_KMnose[[i]]<-sqrt(deepsurvTno$std.err[2]^2+deepsurvTno$std.err[1]^2)
+  deepsurvXno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(D_X_result[[i]]<0),]), times = tt)
+  deepsurv_X_KMno[[i]]<-deepsurvXno$surv[2]-deepsurvXno$surv[1]
+  deepsurv_X_KMnose[[i]]<-sqrt(deepsurvXno$std.err[2]^2+deepsurvXno$std.err[1]^2)
+  csfno<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared[which(csf_result[[i]]<0),]), times = tt)
+  csf_KMno[[i]]<-csfno$surv[2]-csfno$surv[1]
+  csf_KMnose[[i]]<-sqrt(csfno$std.err[2]^2+csfno$std.err[1]^2)
+}
+
+allcombined<-c(unlist(rsf_T_KM),unlist(rsf_X_KM),unlist(baft_T_KM),unlist(baft_X_KM),unlist(deepsurv_T_KM),unlist(deepsurv_X_KM),unlist(csf_KM))
+allcombinedse<-c(unlist(rsf_T_KMse),unlist(rsf_X_KMse),unlist(baft_T_KMse),unlist(baft_X_KMse),unlist(deepsurv_T_KMse),unlist(deepsurv_X_KMse),unlist(csf_KMse))
+
+allcombined_no<-c(unlist(rsf_T_KMno),unlist(rsf_X_KMno),unlist(baft_T_KMno),unlist(baft_X_KMno),unlist(deepsurv_T_KMno),unlist(deepsurv_X_KMno),unlist(csf_KMno))
+allcombined_nose<-c(unlist(rsf_T_KMnose),unlist(rsf_X_KMnose),unlist(baft_T_KMnose),unlist(baft_X_KMnose),unlist(deepsurv_T_KMnose),unlist(deepsurv_X_KMnose),unlist(csf_KMnose))
+
+```
+
+Overall mean treatment effect:
+
+```{r}
+fall <- survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared)
+allresults<-summary(survfit(Surv(Time, Event) ~ Treatment, data = AREDS_shared), times = tt)
+meandiff<-allresults$surv[2]-allresults$surv[1]
+meandiffse<-sqrt(allresults$std.err[2]^2+allresults$std.err[1]^2)
+```
+
+Web Figure 8:
+
+```{r}
+colorcheck<-brewer.pal(4,"Set2")
+par(mfrow=c(2,1))
+par(mar = c(2, 6, 1.2, 1.5))
+par(cex.lab=0.65)
+par(cex.axis=0.65)
+plotss<-barplot(height=c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]),names=c("Overall",rep(c("RSF-T","RSF-X","BAFT-T","BAFT-X","DNNSurv-T","DNNSurv-X","CSF"),3)),col=c(colorcheck[4],rep(colorcheck[1],7),rep(colorcheck[2],7),rep(colorcheck[3],7)),las=2,ylim=c(-0.05,0.25),cex.axis=0.65)
+legend(x="topleft",fill=c(colorcheck[4],colorcheck[1],colorcheck[2],colorcheck[3]),legend = c("Overall ATE","split 1","split 2","split 3"),cex=0.65,bty = "n")
+segments(plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+         plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1)
+arrows(plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+       plotss, c(meandiff,allcombined[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombinedse[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1, angle = 90,code = 3, length = 0.05)
+plotss<-barplot(height=c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]),names=c("Overall",rep(c("RSF-T","RSF-X","BAFT-T","BAFT-X","DNNSurv-T","DNNSurv-X","CSF"),3)),col=c(colorcheck[4],rep(colorcheck[1],7),rep(colorcheck[2],7),rep(colorcheck[3],7)), las=2,ylim=c(-0.27,0.03),xaxt="n")
+segments(plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+         plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1,col="black")
+arrows(plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) - c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), 
+       plotss, c(meandiff,allcombined_no[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]) + c(meandiffse,allcombined_nose[c(1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21)]), lwd = 1, angle = 90,col="black",code = 3, length = 0.05)
+```
+
+### Variable importance (time of interest=3)
+
+This section reproduces variable importance results when time of interest=3, using Boruta algorithm when treatment recommendation is based on D-X. 
+
+As we do not share the full data, we give an example code of reproducing the results by loading intermediate results, which is saved under "RealDataAnalysis/intermediate_result":
+
+Load intermediate results:
+
+```{r}
+# load Borura algorithm results
+library(readxl)
+Boruta_DNNsurv_X3Yrs_split1 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split1")
+Boruta_DNNsurv_X3Yrs_split2 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split2")
+Boruta_DNNsurv_X3Yrs_split3 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split3")
+
+# load CE4 SNP names:
+load(paste0(your_directory,"/intermediate_result/ce4SNPs.RData"))
+```
+
+Number of important features in split 1 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X3Yrs_split1$SNP,ce4SNPs)) 
+```
+
+Number of important features in split 2 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X3Yrs_split2$SNP,ce4SNPs)) 
+```
+
+Number of important features in split 3 by Boruta:
+
+```{r echo=FALSE}
+length(intersect(Boruta_DNNsurv_X3Yrs_split3$SNP,ce4SNPs)) 
+```
+
+Important features across 3 splits:
+
+```{r echo=FALSE}
+overlap<-intersect(Boruta_DNNsurv_X3Yrs_split1$SNP,intersect(Boruta_DNNsurv_X3Yrs_split2$SNP,Boruta_DNNsurv_X3Yrs_split3$SNP))
+length(intersect(overlap,ce4SNPs))
+overlap
+```
+
+### SNPs in common at time of interest=3 and time of interest=5
+Load intermediate results at time of interest=3:
+
+```{r}
+# load Borura algorithm results
+library(readxl)
+Boruta_DNNsurv_X3Yrs_split1 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split1")
+Boruta_DNNsurv_X3Yrs_split2 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split2")
+Boruta_DNNsurv_X3Yrs_split3 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X3Yrs.xlsx"), sheet = "split3")
+
+# load CE4 SNP names:
+load(paste0(your_directory,"/intermediate_result/ce4SNPs.RData"))
+```
+
+Load intermediate results at time of interest=5:
+
+```{r}
+# load Borura algorithm results
+library(readxl)
+Boruta_DNNsurv_X5Yrs_split1 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split1")
+Boruta_DNNsurv_X5Yrs_split2 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split2")
+Boruta_DNNsurv_X5Yrs_split3 <- read_excel(paste0(your_directory,"/intermediate_result/Boruta_DNNsurv_X5Yrs.xlsx"), sheet = "split3")
+
+# load CE4 SNP names:
+load(paste0(your_directory,"/intermediate_result/ce4SNPs.RData"))
+```
+
+Important features time of interest=3 across 3 splits:
+
+```{r echo=FALSE}
+overlap_tt3<-intersect(Boruta_DNNsurv_X3Yrs_split1$SNP,intersect(Boruta_DNNsurv_X3Yrs_split2$SNP,Boruta_DNNsurv_X3Yrs_split3$SNP))
+length(intersect(overlap_tt3,ce4SNPs))
+```
+
+Important features time of interest=5 across 3 splits:
+
+```{r echo=FALSE}
+overlap_tt5<-intersect(Boruta_DNNsurv_X5Yrs_split1$SNP,intersect(Boruta_DNNsurv_X5Yrs_split2$SNP,Boruta_DNNsurv_X5Yrs_split3$SNP))
+length(intersect(overlap_tt5,ce4SNPs))
+```
+
+Overlapped SNPs between time of interest=3 and time of interest=5:
+```{r echo=FALSE}
+intersect(overlap_tt3,overlap_tt5)
+```
+
+# AREDS2 data analysis
+
+This section provides example codes of validating findings from AREDS on AREDS2. Since we do not provide full data, we privde example codes of running D-X. Intermediate results are saved under "RealDataAnalysis/intermediate_result/5timesDXresults_AREDS2ExcludeSevere_Time5.RData" to reproduce plots and tables in the manuscript.
+
+## Example code of validating D-X in AREDS2
+
+We give an example code of validating D-X on AREDS2 data when time of interest is 5 years. Since we do not share the full dataset, codes in this section are commented out and are served as an example of running functions on real data. 
+
+For 3 years, please change the "tt" in the following code.
+
+```{r}
+# time of interest
+#tt <- 5 # change time of interest
+```
+
+Change your working director using code: your_directory <- setwd("Your directory of folder 'RealDataAnalysis'")
+
+To run D-X in R, we call tensorflow in Python from R. It requires the following steps: \
+
+- Please install Anaconda on your computer. [Instructions can be found here:] (https://docs.anaconda.com/anaconda/install/index.html). \
+
+- In R, please install "reticulate", "tensorflow", and "keras" in R using the following codes if you haven't. 
+
+```{r}
+#install.packages("reticulate")
+#install.packages("tensorflow")
+#install.packages("keras")
+```
+
+- open terminal \
+- type: conda activate r-reticulate \
+- back to Rstudio \
+- type code: source("Your directory/DNNSurv_HTE_survival.R") \
+- Procedures might differ in Windows or mac systems. 
+
+Load packages and functions:
+
+```{r}
+### load packages and functions for calling Python in R
+# call tensorflow and keras
+#library(reticulate)
+#use_condaenv("r-reticulate")
+#library(tensorflow)
+#library(keras)
+
+# check if tensorflow is successfully called
+#tf$config$experimental_run_functions_eagerly(TRUE)
+#tf$constant("Hello Tensorflow")
+
+# check env of python, keras, numpy, tensorflow are under r-reticulate
+#py_config()
+#py_discover_config("keras")
+#py_discover_config("numpy")
+#py_discover_config("tensorflow")
+
+### load other packages and functions
+#library(survival)
+#library(randomForestSRC)
+#library(tidyverse)
+#library(gbm)
+#library(randomForest)
+#library(pec)
+#library(mgcv)
+#source(paste0(your_directory,"/source_files/fun_util.R"))
+#source(paste0(your_directory,"/source_files/DNNSurv_HTE_survival.R"))
+```
+
+Load the dataset (the loaded data name is dat_noID.):
+
+```{r}
+# load AREDS data
+#load("AREDS.RData") # loaded data name is dat_noID.
+
+# load AREDS2 data
+#load("AREDS2_placebo_DX_noID.RData") # loaded data names is AREDS2_placebo_noID1
+```
+
+Run 5 times of D-X training on AREDS and predicting on AREDS2 at time.interest=5:
+
+```{r}
+## exclude severe patients
+#AREDS2_placebo_noID1_exc <- AREDS2_placebo_noID1[-which(AREDS2_placebo_noID1$SevScaleBL==7 | AREDS2_placebo_noID1$SevScaleBL==8),]
+
+### 1st time
+#set.seed(12345)
+#deepsurv_x_exc_time5<-DNNsurv_HTE_X(data=dat_noID,testdat=AREDS2_placebo_noID1_exc,time.interest = tt,ntrees=1000)
+#length(which(deepsurv_x_exc_time5$diff>=0)) 
+
+### 2nd time
+#set.seed(160000)
+#deepsurv_x_exc_time5_2<-DNNsurv_HTE_X(data=dat_noID,testdat=AREDS2_placebo_noID1_exc,time.interest = tt,ntrees=1000)
+#length(which(deepsurv_x_exc_time5_2$diff>=0)) 
+
+### 3rd time
+#set.seed(143200)
+#deepsurv_x_exc_time5_3<-DNNsurv_HTE_X(data=dat_noID,testdat=AREDS2_placebo_noID1_exc,time.interest = tt,ntrees=1000)
+#length(which(deepsurv_x_exc_time5_3$diff>=0)) 
+
+### 4th time
+#set.seed(165422)
+#deepsurv_x_exc_time5_4<-DNNsurv_HTE_X(data=dat_noID,testdat=AREDS2_placebo_noID1_exc,time.interest = tt,ntrees=1000)
+#length(which(deepsurv_x_exc_time5_4$diff>=0)) 
+
+### 5th time
+#set.seed(172643)
+#deepsurv_x_exc_time5_5<-DNNsurv_HTE_X(data=dat_noID,testdat=AREDS2_placebo_noID1_exc,time.interest = tt,ntrees=1000)
+#length(which(deepsurv_x_exc_time5_5$diff>=0))
+
+#newdat3 <- as.data.frame(cbind(deepsurv_x_exc_time5$diff,deepsurv_x_exc_time5_2$diff,deepsurv_x_exc_time5_3$diff,deepsurv_x_exc_time5_4$diff,deepsurv_x_exc_time5_5$diff))
+#save(newdat3,file = paste0(your_directory,"/intermediate_result/5timesDXresults_AREDS2ExcludeSevere_Time5.RData"))
+
+```
+
+## Reproduce tables and figures
+
+In this section, we reproduce results in section 4.4 of the manuscript by loading the intermediate results saved under "RealDataAnalysis/intermediate_result/5timesDXresults_AREDS2ExcludeSevere_Time5.RData".
+
+Load intermediate results:
+
+```{r}
+load(paste0(your_directory,"/intermediate_result/5timesDXresults_AREDS2ExcludeSevere_Time5.RData")) # loaded data name is newdat3.
+```
+
+Load shared AREDS2 data:
+
+```{r}
+load(paste0(your_directory,"/data/AREDS2_shared.RData")) # loaded data name is AREDS2_shared.
+```
+
+### Results in section 4.4 of the manuscript
+
+Install the following packages if you haven't:
+
+```{r}
+#install.packages("dplyr")
+#install.packages("survminer")
+```
+
+Use averaged CATE for the treatment recommendations. The number of positive averaged CATE:
+
+```{r}
+newdat3$ave <- ifelse( ((newdat3$V1+newdat3$V2+newdat3$V3+newdat3$V4+newdat3$V5)/5 )>=0, 1,0)
+length(which(newdat3$ave==1))
+```
+
+Log rank test comparing "recommended for treatment" vs. "not recommended for treatment":
+
+```{r}
+# log rank test on recommended for trt vs. not recommended for trt
+AREDS2_shared$time5_ave <- ifelse(newdat3$ave==1,1,0)
+KM_target_nontarget_time5_ave <- survfit(Surv(Time, Event) ~ time5_ave, data =AREDS2_shared)
+
+library(dplyr)
+library(survminer)
+ggsurvplot(KM_target_nontarget_time5_ave, data = AREDS2_shared, pval =TRUE,legend.title="Strata",legend.labs=c("RC","RT"),xlab="Year",ylab="Progression-free probability") 
+```
+
+```{r echo=FALSE}
+library(survival)
+library(dplyr)
+library(survminer)
+```
+
+### Table 3 (lower panel)
+
+This section reproduces genetic profile (Table 3 lower panel). Partial data shared is saved under "RealDataAnalysis/data". Please run last section "Results in section 4.4 of the manuscript" first. 
+
+Install "Table1" package if you haven't:
+
+```{r }
+#library(devtools)
+#install_github("emwozniak/Table1")
+```
+
+Load library:
+
+```{r echo=FALSE}
+library(tableone)
+```
+
+Table 3 (Upper panel) with Fisher exact tests: (0: AA; 1:Aa; 2:aa)
+
+```{r}
+catVars <- c("rs1245576", "rs8109218","rs147106198")
+
+# Overall column
+tab1 <- CreateTableOne(vars = catVars, data = AREDS2_shared, factorVars = catVars)
+tab1
+# RT, RC and p columns
+tab2 <- CreateTableOne(vars = catVars, strata = "time5_ave" , data = AREDS2_shared, factorVars = catVars)
+print(tab2, showAllLevels = TRUE,exact = "stage",formatOptions = list(big.mark = ","))
+```
+
