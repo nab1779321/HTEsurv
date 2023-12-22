@@ -70,7 +70,7 @@ All real data analysis files are stored at "RealDataAnalysis" folder. Within thi
 
 - We used R and Python interface "r-reticulate" for running neural networks in Rstudio. r-reticulate is an R and Python interface (virtual environment) for R user to use Python for some works, e.g. calling Python from R, translating R and Python objects, checking the path where Python packages are installed, etc. Please install R package "reticulate" using the code: install.packages("reticulate").
 
-- We use Keras from Python to build survival neural network in Rstudio. Please following the (official guide) (https://tensorflow.rstudio.com/install/) for installing Tensorflow and Keras in Rstudio. 
+- We use Keras from Python to build survival neural network in Rstudio. Please following the official guide (https://tensorflow.rstudio.com/install/) for installing Tensorflow and Keras in Rstudio. 
 
 - Notes for building neural networks through r-reticulate interface:
  1. Python modules are installed under virtual environment. In the official guide, line "install_tensorflow(envname = "r-tensorflow")" means your
