@@ -1,5 +1,5 @@
 # HTEsurv
-The "HTEsurv" repository includes codes for running T-learner and X-learner with random survival forests, Bayesian accelerated failure time models and deep survival neural networks as base learners in the paper "A Meta-Learner Framework to Estimate Individualized Treatment Effects for Survival Outcomes" (minor revision in Journal of Data Science; preprint available in 10.21203/rs.3.rs-3356139/v1). The "Simulations" folder contains the codes for reproducing simulation results. Please see the detailed description below.
+The "HTEsurv" repository includes codes for running T-learner and X-learner with random survival forests, Bayesian accelerated failure time models and deep survival neural networks as base learners in the paper "A Meta-Learner Framework to Estimate Individualized Treatment Effects for Survival Outcomes" (minor revision in Journal of Data Science; preprint available in 10.21203/rs.3.rs-3356139/v1). We provide codes for reproducibility. Please see the detailed description below.
 
 ## 1. Guidance
 All simulation files are stored at "Simulations" folder. All real data analysis files are stored at "RealDataAnalysis" folder. We will describe contents in the folder below.
