@@ -43,7 +43,7 @@ All simulation files are stored at "Simulations" folder. Within this folder:
 12. weibull_true.R includes the function for running the Weibull model which is considered as the true model when true potential survival times are generated from the Weibull model.
 
 ### 2.2 Example of one run of simulation when data is generated from Weibull models under balanced design and scenario 1
-File "Example_code_simulation_1run.Rmd" gives an example of running one simulation when data is generated from Weibull models under balanced design and scenario 1. You can open and knit or run it by following the instructions in it. It also contains instructions of running D-T and D-X in Python. Other simulation settings can be run in the same way. 
+File "Example_code_simulation_1run.Rmd" gives an example of running one simulation when data is generated from Weibull models under balanced design and scenario 1. You can open and knit or run it by following the instructions in it. It also contains instructions of running D-T and D-X in Python. Other simulation settings can be run in the same way. Please use Tensorflow1 for running Python scripts.
 
 To knit this Rmd file, please run code install.packages("bookdown") to install "bookdown" package. Before you knit this file, please follow the instruction in line 24 to add a code chunk of setting up the directory.
 
