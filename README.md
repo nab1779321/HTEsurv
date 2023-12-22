@@ -77,9 +77,9 @@ All real data analysis files are stored at "RealDataAnalysis" folder. Within thi
  tensorflow is installed under virtual environment "r-tensorflow", which is automatically created when you run this code. You can give a different
  name for it (e.g. we name it as "r-reticulate".). The same rationale for installing Keras. 
 
- 3. If you never have Python or Anaconda installed on your computer, it will prompt a question: "Would you like to install Miniconda? [Y/n]:". Please  type Y. 
+ 2. If you never have Python or Anaconda installed on your computer, it will prompt a question: "Would you like to install Miniconda? [Y/n]:". Please  type Y. 
 
- 4. The most important point: Python and all Python packages have to be installed under the same virtual environment.
+ 3. The most important point: Python and all Python packages have to be installed under the same virtual environment.
 
 - "data" folder contains partially shared AREDS and AREDS2 data. We do not share full data, but we share outcomes, treatment information and three
  SNPs for generating tables. 
