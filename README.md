@@ -16,7 +16,7 @@ All simulation files are stored at "Simulations" folder. Within this folder:
 
 - Our Python codes are coded under Tensorflow1. Please enforce Tensorflow1 for running the Python scripts.
 
-- "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T, D-X, weibull true model, logistic true model and data generation process. Here are more detailed descriptions:\
+- "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T, D-X, weibull true model, logistic true model and data generation process. Here are more detailed descriptions:
 
  1. baft_TXlearners.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
 
@@ -72,7 +72,7 @@ All real data analysis files are stored at "RealDataAnalysis" folder. Within thi
 
 - We use Keras from Python to build survival neural network in Rstudio. Please following the (official guide) (https://tensorflow.rstudio.com/install/) for installing Tensorflow and Keras in Rstudio. 
 
-- Notes for building neural networks through r-reticulate interface:\
+- Notes for building neural networks through r-reticulate interface:
  1. Python modules are installed under virtual environment. In the official guide, line "install_tensorflow(envname = "r-tensorflow")" means your
  tensorflow is installed under virtual environment "r-tensorflow", which is automatically created when you run this code. You can give a different
  name for it (e.g. we name it as "r-reticulate".). The same rationale for installing Keras. 
@@ -84,7 +84,7 @@ All real data analysis files are stored at "RealDataAnalysis" folder. Within thi
 - "data" folder contains partially shared AREDS and AREDS2 data. We do not share full data, but we share outcomes, treatment information and three
  SNPs for generating tables. 
 
-- "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T and D-X. Here are more detailed descriptions:\
+- "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T and D-X. Here are more detailed descriptions:
 
  1. aft_bart_np_survival.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
 
