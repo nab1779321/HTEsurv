@@ -18,29 +18,33 @@ All simulation files are stored at "Simulations" folder. Within this folder:
 
 - "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T, D-X, weibull true model, logistic true model and data generation process. Here are more detailed descriptions:\
 
-1. baft_TXlearners.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
+ 1. baft_TXlearners.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
 
-2. baft_bart_np_SurvivalProb.R is sourced to predict survival probabilities in baft_TXlearners.R.
+ 2. baft_bart_np_SurvivalProb.R is sourced to predict survival probabilities in baft_TXlearners.R.
 
-3. rsf_TXlearners.R includes functions for running T- and X-learners for random survival forests (RSF). 
+ 3. rsf_TXlearners.R includes functions for running T- and X-learners for random survival forests (RSF). 
 
-4. DNNSurv_Tlearner_1run.py includes the function for running T-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for one simulation.
+ 4. DNNSurv_Tlearner_1run.py includes the function for running T-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for one simulation.
 
-5. DNNSurv_Tlearner_100runs.py includes the function for running T-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for 100 simulations.
+ 5. DNNSurv_Tlearner_100runs.py includes the function for running T-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for 100 simulations.
 
-6. DNNSurv_Xlearner_1run.py includes the function for running X-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for one simulation.
+ 6. DNNSurv_Xlearner_1run.py includes the function for running X-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for  one simulation.
 
-7. DNNSurv_Xlearner_100runs.py includes the function for running X-learner for Cox-based deep neural network models for survival outcomes (DNNSurv) for 100 simulations.
+ 7. DNNSurv_Xlearner_100runs.py includes the function for running X-learner for Cox-based deep neural network models for survival outcomes (DNNSurv)   for 100 simulations.
 
-8. fun_util.py is sourced in DNNSurv_Tlearner.py and DNNSurv_Xlearner.py for calculating the baseline hazards.
+ 8. fun_util.py is sourced in DNNSurv_Tlearner.py and DNNSurv_Xlearner.py for calculating the baseline hazards.
 
-9. simulation_design_survival_StandardLogistic.R includes the function for data generation when true potential survival times are generated from log-logistic models.
+ 9. simulation_design_survival_StandardLogistic.R includes the function for data generation when true potential survival times are generated from
+ log-logistic models.
 
-10. simulation_design_survival_Weibull.R includes the function for data generation when true potential survival times are generated from Weibull models.
+ 11. simulation_design_survival_Weibull.R includes the function for data generation when true potential survival times are generated from Weibull
+ models.
 
-11. StandardLogistic_TrueModel.R includes the function for running the log-logistic model which is considered as the true model when true potential survival times are generated from the log-logistic model.
+ 13. StandardLogistic_TrueModel.R includes the function for running the log-logistic model which is considered as the true model when true potential
+ survival times are generated from the log-logistic model.
 
-12. weibull_true.R includes the function for running the Weibull model which is considered as the true model when true potential survival times are generated from the Weibull model.
+ 15. weibull_true.R includes the function for running the Weibull model which is considered as the true model when true potential survival times are
+ generated from the Weibull model.
 
 ### 2.2 Example of one run of simulation when data is generated from Weibull models under balanced design and scenario 1
 File "Example_code_simulation_1run.Rmd" gives an example of running one simulation when data is generated from Weibull models under balanced design and scenario 1. You can open and knit or run it by following the instructions in it. It also contains instructions of running D-T and D-X in Python. Other simulation settings can be run in the same way. Please use Tensorflow1 for running Python scripts.
@@ -69,25 +73,29 @@ All real data analysis files are stored at "RealDataAnalysis" folder. Within thi
 - We use Keras from Python to build survival neural network in Rstudio. Please following the (official guide) (https://tensorflow.rstudio.com/install/) for installing Tensorflow and Keras in Rstudio. 
 
 - Notes for building neural networks through r-reticulate interface:\
-1. Python modules are installed under virtual environment. In the official guide, line "install_tensorflow(envname = "r-tensorflow")" means your tensorflow is installed under virtual environment "r-tensorflow", which is automatically created when you run this code. You can give a different name for it (e.g. we name it as "r-reticulate".). The same rationale for installing Keras. 
+ 1. Python modules are installed under virtual environment. In the official guide, line "install_tensorflow(envname = "r-tensorflow")" means your
+ tensorflow is installed under virtual environment "r-tensorflow", which is automatically created when you run this code. You can give a different
+ name for it (e.g. we name it as "r-reticulate".). The same rationale for installing Keras. 
 
-2. If you never have Python or Anaconda installed on your computer, it will prompt a question: "Would you like to install Miniconda? [Y/n]:". Please type Y. 
+ 3. If you never have Python or Anaconda installed on your computer, it will prompt a question: "Would you like to install Miniconda? [Y/n]:". Please  type Y. 
 
-3. The most important point: Python and all Python packages have to be installed under the same virtual environment.
+ 4. The most important point: Python and all Python packages have to be installed under the same virtual environment.
 
-- "data" folder contains partially shared AREDS and AREDS2 data. We do not share full data, but we share outcomes, treatment information and three SNPs for generating tables. 
+- "data" folder contains partially shared AREDS and AREDS2 data. We do not share full data, but we share outcomes, treatment information and three
+ SNPs for generating tables. 
 
 - "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T and D-X. Here are more detailed descriptions:\
 
-1. aft_bart_np_survival.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
+ 1. aft_bart_np_survival.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
 
-2. aft_bart_np_SurvivalProb.R is sourced to predict survival probabilities in aft_bart_np_survival.R.
+ 2. aft_bart_np_SurvivalProb.R is sourced to predict survival probabilities in aft_bart_np_survival.R.
 
-3. DNNSurv_HTE_survival.R includes the functions for running T- and X-learner for Cox-based deep neural network models for survival outcomes (DNNSurv). This requires to source TensorFlow from Python.
+ 3. DNNSurv_HTE_survival.R includes the functions for running T- and X-learner for Cox-based deep neural network models for survival outcomes
+ (DNNSurv). This requires to source TensorFlow from Python.
 
-4. fun_util.R is sourced in DNNSurv_HTE_survival.R for calculating the baseline hazards.
+ 5. fun_util.R is sourced in DNNSurv_HTE_survival.R for calculating the baseline hazards.
 
-5. rsf_HTE_survival.R includes the functions for running T- and X-learners for random survival forests (RSF). 
+ 6. rsf_HTE_survival.R includes the functions for running T- and X-learners for random survival forests (RSF). 
 
 
 ### 3.2 Reproduce tables and figures in real data analysis
