@@ -14,6 +14,8 @@ All simulation files are stored at "Simulations" folder. Within this folder:
 
 - "prepared_simulation_data_example" folder contains one training data (train1.RData) and test (test.RData) data prepared by us for simulations when data is generated from Weibull models under balanced design and scenario 1. "Tlearner_result.csv" and "Xlearner_result.csv" are simulation results of D-T and D-X by submitting Python script "DNNSurv_Tlearner_1run.py" and "DNNSurv_Xlearner_1run.py" in "Simulations/source_files" folder, using our prepared training and test data. Please refer to the R markdown file "Example_code_simulation_1run.Rmd" described in section "Example of one run of simulation when data is generated from Weibull models under balanced design and scenario 1" below for running D-T and D-X in Python.
 
+- Our Python codes are coded under Tensorflow1. Please enforce Tensorflow1 for running the Python scripts.
+
 - "source_files" folder contains all functions needed to run R-T, R-X, B-T, B-X, D-T, D-X, weibull true model, logistic true model and data generation process. Here are more detailed descriptions:\
 
 1. baft_TXlearners.R includes functions for running T- and X-learners for bayesian accelerated failure models (BAFT). 
