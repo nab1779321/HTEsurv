@@ -1,5 +1,6 @@
 # HTEsurv
 The "HTEsurv" repository includes codes for running T-learner and X-learner with random survival forests, Bayesian accelerated failure time models and deep survival neural networks as base learners in the paper:
+
 Na Bo, Yue Wei, Lang Zeng, Chaeryon Kang, Ying Ding, A Meta-Learner Framework to Estimate Individualized Treatment Effects for Survival Outcomes, J. data sci. 22(2024), no. 4, 505-523, DOI 10.6339/24-JDS1119. [Published paper](https://jds-online.org/journal/JDS/article/1354/info)
 
 We provide codes for reproducibility. Please see the detailed description below.
